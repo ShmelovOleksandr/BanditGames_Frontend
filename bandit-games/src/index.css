@@ -6,7 +6,7 @@ html,
 body,
 #root {
   @apply h-screen overflow-hidden;
-  @apply bg-danger-10 text-white; /* Tailwind utility classes */
+  @apply bg-secondary-100 text-white; /* Tailwind utility classes */
   height: 100%;
   margin: 0;
   padding: 0;
