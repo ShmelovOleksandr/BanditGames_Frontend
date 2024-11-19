@@ -57,6 +57,6 @@ export const siteConfig = {
         twitter: "https://twitter.com/getnextui",
         instagram: "#",
         docs: "https://nextui.org",
-        sponsor: "#",
+        login: "#",
     },
 };

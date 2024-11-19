@@ -19,7 +19,6 @@ import {
     TwitterIcon,
     GithubIcon,
     DiscordIcon,
-    HeartFilledIcon,
     SearchIcon,
     Logo,
 } from "@/components/icons.tsx";
@@ -51,8 +50,9 @@ export const Navigation = () => {
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit">
                     <Link className="flex justify-start items-center gap-1" href="/">
-                        <Logo/>
-                        <p className="font-bold bg-gradient-to-r from-secondary-200 via-secondary-500 to-secondary-600 text-transparent bg-clip-text">BANDIT GAMES</p>
+                        <Logo color="#310150"/>
+                        <p className="font-bold bg-gradient-to-r from-secondary-200 via-secondary-500 to-secondary-600 text-transparent bg-clip-text">BANDIT
+                            GAMES</p>
                     </Link>
                 </NavbarBrand>
                 <div className="hidden lg:flex gap-4 justify-start ml-2">
@@ -91,13 +91,12 @@ export const Navigation = () => {
                 <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
                 <NavbarItem className="hidden md:flex">
                     <Button
-                        isExternal
                         as={Link}
                         className="text-sm font-normal text-default-600 bg-default-100"
-                        href={siteConfig.links.sponsor}
+                        href={siteConfig.links.login}
                         variant="flat"
                     >
-                        Sign Up
+                        Log In
                     </Button>
                 </NavbarItem>
             </NavbarContent>

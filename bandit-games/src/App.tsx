@@ -16,8 +16,8 @@ function App() {
 
             <main>
                 {route === '/' && <Home/>}
-                {route === '/my-account' && <Account/>}
-                {route === '/game-library' && <Library/>}
+                {/*{route === '/my-account' && <Account/>}*/}
+                {/*{route === '/game-library' && <Library/>}*/}
             </main>
         </div>
     );

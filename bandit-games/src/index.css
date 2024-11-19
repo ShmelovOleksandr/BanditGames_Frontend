@@ -5,11 +5,8 @@
 html,
 body,
 #root {
-  @apply bg-secondary-100 text-white;
+  @apply bg-secondary-100;
   margin: 0;
   padding: 0;
 }
 
-img {
-  @apply max-w-none;
-}
