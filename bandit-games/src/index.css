@@ -5,7 +5,6 @@
 html,
 body,
 #root {
-  @apply min-h-screen overflow-y-auto;
   @apply bg-secondary-100 text-white;
   margin: 0;
   padding: 0;

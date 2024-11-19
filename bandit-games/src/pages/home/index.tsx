@@ -17,7 +17,7 @@ export const Home = () => {
                 <div className="inline-block max-w-lg text-center justify-center">
                     <h1 className={title()}> Welcome to BanditGames!</h1>
                 </div>
-                <div className="text-center justify-center px-3">
+                <div className="text-center justify-center px-3 ">
                     <p className={subtitle()}>
                         Dive into a world of fun and excitement with personalized game
                         recommendations tailored just for you. Track your progress, connect
