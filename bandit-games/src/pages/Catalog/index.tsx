@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {useEffect, useState} from "react";
+import NotFound from "@/pages/Not-found";
 
 interface Game {
     gameId: string;
@@ -9,19 +10,30 @@ interface Game {
     currencyCode: string;
 }
 
+const apiUrl = import.meta.env.VITE_LOCAL_BASE_URL;
+
 export const Catalog: React.FC = () => {
     const [data, setData] = useState<Game[]>([]);
+    const [error, setError] = useState<string | null>(null);
+
 
     useEffect(() => {
-        axios.get('http://localhost:8041/api/v1/games')
+        axios.get(`${apiUrl}/api/v1/games`)
             .then(response => {
                 setData(response.data);
                 console.log(data)
             })
-            .catch(error => {
-                console.log(error);
+            .catch((err) => {
+                console.error('Error fetching data:', err);
+                setError('Failed to fetch games. Please try again later.');
             });
     }, []);
+
+    if (error) {
+        return (
+            <NotFound error={error}/>
+        );
+    }
     return (
         <ul>
             {data.map((game) => (
