@@ -9,7 +9,7 @@ const draw = {
         pathLength: 1,
         opacity: 1,
         transition: {
-            pathLength: {delay: i * 0.5, type: "spring", duration: 1.5, bounce: 0},
+            pathLength: {delay: i * 0.5, type: "spring", duration: 2.5, bounce: 0},
             opacity: {delay: i * 0.5, duration: 0.01},
         },
     }),

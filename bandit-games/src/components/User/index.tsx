@@ -14,6 +14,7 @@ const CustomUser: React.FC<UserProps> = ({name, description, avatarSrc}) => {
             avatarProps={{
                 src: avatarSrc,
             }}
+            className="text-gray-500"
         />
     );
 };

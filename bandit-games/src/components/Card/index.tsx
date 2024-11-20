@@ -14,7 +14,7 @@ const ReusableCard: React.FC<ReusableCardProps> = ({
                                                        imageSrc,
                                                    }) => {
     return (
-        <Card className="py-4 w-[300px]">
+        <Card className="bg-secondary-800 py-4 w-[300px] ">
             <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
                 {subtitle && <p className="text-tiny uppercase font-bold">{subtitle}</p>}
                 <small className="text-default-500">{description}</small>
