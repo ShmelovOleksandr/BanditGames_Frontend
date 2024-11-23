@@ -1,7 +1,7 @@
-import {Link} from "@nextui-org/link";
-import {siteConfig} from "@/config/site.ts";
-import {DiscordIcon, GithubIcon, Logo, TwitterIcon} from "@/components/icons.tsx";
-import {Navigation} from "@/components/Navbar";
+import {Link} from '@nextui-org/link'
+import {siteConfig} from '@/config/site.ts'
+import {DiscordIcon, GithubIcon, Logo, TwitterIcon} from '@/components/icons.tsx'
+import {Navigation} from '@/components/Navbar'
 
 export default function DefaultLayout({
                                           children,
@@ -66,5 +66,5 @@ export default function DefaultLayout({
                 </footer>
             </div>
         </>
-    );
+    )
 }

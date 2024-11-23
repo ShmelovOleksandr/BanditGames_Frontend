@@ -1,23 +1,24 @@
-import {motion, useAnimation} from "framer-motion";
-import {useInView} from "react-intersection-observer";
-import {useEffect} from "react";
+import {motion, useAnimation} from 'framer-motion'
+import {useInView} from 'react-intersection-observer'
+import {useEffect} from 'react'
+import * as React from 'react'
 
-export const Section = ({children, className, style}) => {
-    const controls = useAnimation();
-    const [ref, inView] = useInView({threshold: 0.2});
+const SectionComponent: React.FC = ({children, className, style}) => {
+    const controls = useAnimation()
+    const [ref, inView] = useInView({threshold: 0.2})
 
     useEffect(() => {
         if (inView) {
-            controls.start("visible");
+            controls.start('visible')
         } else {
-            controls.start("hidden");
+            controls.start('hidden')
         }
-    }, [controls, inView]);
+    }, [controls, inView])
 
     const variants = {
         hidden: {opacity: 0, y: 50},
         visible: {opacity: 1, y: 0, transition: {duration: 0.5}},
-    };
+    }
 
     return (
         <motion.div
@@ -30,6 +31,7 @@ export const Section = ({children, className, style}) => {
         >
             {children}
         </motion.div>
-    );
-};
+    )
+}
+export default SectionComponent
 

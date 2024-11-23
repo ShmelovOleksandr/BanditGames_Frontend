@@ -1,4 +1,4 @@
-import {User} from "@nextui-org/react";
+import {User} from '@nextui-org/react'
 
 interface UserProps {
     name: string;
@@ -16,7 +16,7 @@ const CustomUser: React.FC<UserProps> = ({name, description, avatarSrc}) => {
             }}
             className="text-gray-500"
         />
-    );
-};
+    )
+}
 
-export default CustomUser;
+export default CustomUser

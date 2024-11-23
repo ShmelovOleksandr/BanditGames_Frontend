@@ -1,5 +1,5 @@
-import {Button} from "@nextui-org/button";
-import {useNavigate} from "react-router-dom";
+import {Button} from '@nextui-org/button'
+import {useNavigate} from 'react-router-dom'
 
 interface ButtonType {
     link: string;
@@ -7,7 +7,7 @@ interface ButtonType {
 }
 
 const ButtonComponent: React.FC<ButtonType> = ({link, text}) => {
-    const navigate = useNavigate();
+    const navigate = useNavigate()
     return (
         <Button
             className="text-sm font-normal text-default-600 bg-default-100"

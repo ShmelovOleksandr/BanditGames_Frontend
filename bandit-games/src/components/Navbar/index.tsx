@@ -6,35 +6,34 @@ import {
     NavbarBrand,
     NavbarItem,
     NavbarMenuItem,
-} from "@nextui-org/navbar";
-import {Button} from "@nextui-org/button";
-import {Kbd} from "@nextui-org/kbd";
-// import {Link} from "@nextui-org/link";
-import {Link} from 'react-router-dom';
+} from '@nextui-org/navbar'
+import Button from '@/components/Button/index.tsx'
+import {Kbd} from '@nextui-org/kbd'
+import {Link} from 'react-router-dom'
 
-import {Input} from "@nextui-org/input";
-import {link as linkStyles} from "@nextui-org/theme";
-import clsx from "clsx";
+import {Input} from '@nextui-org/input'
+import {link as linkStyles} from '@nextui-org/theme'
+import clsx from 'clsx'
 
-import {siteConfig} from "@/config/site";
+import {siteConfig} from '@/config/site'
 import {
     TwitterIcon,
     GithubIcon,
     DiscordIcon,
     SearchIcon,
     Logo,
-} from "@/components/icons.tsx";
+} from '@/components/icons.tsx'
 
 export const Navigation = () => {
     const searchInput = (
         <Input
             aria-label="Search"
             classNames={{
-                inputWrapper: "bg-default-100",
-                input: "text-sm",
+                inputWrapper: 'bg-default-100',
+                input: 'text-sm',
             }}
             endContent={
-                <Kbd className="hidden lg:inline-block" keys={["ctrl"]}>
+                <Kbd className="hidden lg:inline-block" keys={['ctrl']}>
                     K
                 </Kbd>
             }
@@ -45,7 +44,7 @@ export const Navigation = () => {
             }
             type="search"
         />
-    );
+    )
 
     return (
         <NextUINavbar maxWidth="xl" position="sticky">
@@ -62,8 +61,8 @@ export const Navigation = () => {
                         <NavbarItem key={item.href}>
                             <Link to={`/${item.href}`}
                                   className={clsx(
-                                      linkStyles({color: "foreground"}),
-                                      "data-[active=true]:text-primary data-[active=true]:font-medium",
+                                      linkStyles({color: 'foreground'}),
+                                      'data-[active=true]:text-primary data-[active=true]:font-medium',
                                   )}
                                   color="foreground"
                                   href={item.href}
@@ -92,14 +91,7 @@ export const Navigation = () => {
                 </NavbarItem>
                 <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
                 <NavbarItem className="hidden md:flex">
-                    <Button
-                        as={Link}
-                        className="text-sm font-normal text-default-600 bg-default-100"
-                        href={siteConfig.links.login}
-                        variant="flat"
-                    >
-                        Log In
-                    </Button>
+                    <Button link={siteConfig.links.login} text="Log In"/>
                 </NavbarItem>
             </NavbarContent>
 
@@ -113,15 +105,15 @@ export const Navigation = () => {
             <NavbarMenu>
                 {searchInput}
                 <div className="mx-4 mt-2 flex flex-col gap-2">
-                    {siteConfig.navMenuItems.map((item, index) => (
+                    {siteConfig.navItems.map((item, index) => (
                         <NavbarMenuItem key={`${item}-${index}`}>
-                            <Link to={"/" + `${item}`}
+                            <Link to={'/' + `${item}`}
                                   color={
                                       index === 2
-                                          ? "primary"
-                                          : index === siteConfig.navMenuItems.length - 1
-                                              ? "danger"
-                                              : "foreground"
+                                          ? 'primary'
+                                          : index === siteConfig.navItems.length - 1
+                                              ? 'danger'
+                                              : 'foreground'
                                   }
                                   href="#"
                                   size="lg"
@@ -133,5 +125,5 @@ export const Navigation = () => {
                 </div>
             </NavbarMenu>
         </NextUINavbar>
-    );
-};
+    )
+}

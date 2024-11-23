@@ -1,14 +1,12 @@
-import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-import './App.css';
-import {Navigation} from '@/components/Navbar/index.tsx';
-import {Home} from '@/pages/Home';
-import {Catalog} from '@/pages/Catalog';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
+import './App.css'
+import {Home} from '@/pages/Home'
+import {Catalog} from '@/pages/Catalog'
 
 function App() {
     return (
         <Router>
             <div>
-                <Navigation/>
 
                 <main>
                     <Routes>
@@ -18,7 +16,7 @@ function App() {
                 </main>
             </div>
         </Router>
-    );
+    )
 }
 
-export default App;
+export default App
