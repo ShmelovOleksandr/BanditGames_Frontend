@@ -1,26 +1,22 @@
-import {useState} from 'react';
-import './App.css';
-import {Navigation} from '@/components/Navbar/index.tsx';
-import {Home} from '@/pages/home';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
+import './App.css'
+import {Home} from '@/pages/Home'
+import {Catalog} from '@/pages/Catalog'
 
 function App() {
-    const [route, setRoute] = useState('/');
-
-    const navigate = (path: string) => {
-        setRoute(path);
-    };
-
     return (
-        <div>
-            <Navigation navigate={navigate}/>
+        <Router>
+            <div>
 
-            <main>
-                {route === '/' && <Home/>}
-                {/*{route === '/my-account' && <Account/>}*/}
-                {/*{route === '/game-library' && <Library/>}*/}
-            </main>
-        </div>
-    );
+                <main>
+                    <Routes>
+                        <Route path="/" element={<Home/>}/>
+                        <Route path="/game-library" element={<Catalog/>}/>
+                    </Routes>
+                </main>
+            </div>
+        </Router>
+    )
 }
 
-export default App;
+export default App

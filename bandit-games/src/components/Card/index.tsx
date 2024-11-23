@@ -1,10 +1,10 @@
-import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
+import {Card, CardHeader, CardBody, Image} from '@nextui-org/react'
 
 interface ReusableCardProps {
     title: string;
     subtitle?: string;
     description: string;
-    imageSrc: string;
+    imageSrc?: string;
 }
 
 const ReusableCard: React.FC<ReusableCardProps> = ({
@@ -29,7 +29,7 @@ const ReusableCard: React.FC<ReusableCardProps> = ({
                 />
             </CardBody>
         </Card>
-    );
-};
+    )
+}
 
-export default ReusableCard;
+export default ReusableCard
