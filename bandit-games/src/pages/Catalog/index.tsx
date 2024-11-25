@@ -9,6 +9,7 @@ import {motion} from 'framer-motion'
 import SectionComponent from '@/components/Section'
 import {subtitle, title} from '@/components/primitives.ts'
 import SearchInput from '@/components/Search'
+import {Divider} from '@nextui-org/react'
 
 
 interface Game {
@@ -56,9 +57,18 @@ export const Catalog: React.FC = () => {
     return (
         <DefaultLayout>
             <SectionComponent className="flex flex-col gap-4 ">
-                <p className={title({color: 'white'})}>Game Catalog</p>
-                <p className={subtitle({color: 'muted'})}>Explore our diverse collection of exciting games.</p>
-                <SearchInput value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
+                <div className="flex flex-wrap items-center justify-between w-full">
+                    <div>
+                        <p className={title({color: 'white'})}>Game Catalog</p>
+                        <p className={subtitle({color: 'muted'})}>
+                            Explore our diverse collection of exciting games.
+                        </p>
+                    </div>
+                    <div className="mt-4 sm:mt-0">
+                        <SearchInput value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
+                    </div>
+                </div>
+                <hr className="my-4 border-white"></hr>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredGames.map((game) => (
                         <motion.li key={game.gameId}
