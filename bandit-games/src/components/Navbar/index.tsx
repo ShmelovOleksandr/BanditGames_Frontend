@@ -95,6 +95,7 @@ export const Navigation = () => {
                 </NavbarItem>
             </NavbarContent>
 
+
             <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
                 <Link isExternal to={siteConfig.links.github}>
                     <GithubIcon className="text-default-500"/>
