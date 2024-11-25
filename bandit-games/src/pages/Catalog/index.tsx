@@ -45,8 +45,8 @@ export const Catalog: React.FC = () => {
     }
     return (
         <DefaultLayout>
-            <Section className="flex flex-col gap-4">
-                <ul>
+            <Section className="flex flex-col gap-4 ">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {data.map((game) => (
                         <li key={game.gameId}>
                             <Card title={game.title} description={game.description} imageSrc={game.imageSrc}/>
