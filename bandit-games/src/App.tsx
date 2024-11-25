@@ -4,6 +4,7 @@ import {Home} from '@/pages/Home'
 import {Catalog} from '@/pages/Catalog'
 import './App.css'
 import SecurityContextProvider from './context/SecurityContextProvider'
+import GameDetails from '@/pages/Game'
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Home/>}/>
                             <Route path="/game-library" element={<Catalog/>}/>
+                            <Route path="/games/:gameId" element={<GameDetails />} />
                         </Routes>
                     </main>
                 </SecurityContextProvider>

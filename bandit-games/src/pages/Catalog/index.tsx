@@ -1,10 +1,12 @@
 import axios from 'axios'
 import {useEffect, useState} from 'react'
 import NotFound from '../Error'
-import Card from '@/components/Card'
 import DefaultLayout from '@/layouts/default.tsx'
 import Section from '@/components/Section'
 import {faker} from '@faker-js/faker'
+import ReusableCard from '@/components/Card'
+import {Link} from 'react-router-dom'
+import {motion} from 'framer-motion'
 
 
 interface Game {
@@ -48,9 +50,13 @@ export const Catalog: React.FC = () => {
             <Section className="flex flex-col gap-4 ">
                 <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {data.map((game) => (
-                        <li key={game.gameId}>
-                            <Card title={game.title} description={game.description} imageSrc={game.imageSrc}/>
-                        </li>
+                        <motion.li key={game.gameId}
+                                   whileHover={{scale: 1.1}}>
+                            <Link to={`/games?gameId=${game.gameId}`}>
+                                <ReusableCard title={game.title} description={game.description}
+                                              imageSrc={game.imageSrc}/>
+                            </Link>
+                        </motion.li>
                     ))}
                 </ul>
             </Section>
