@@ -4,6 +4,8 @@ import NotFound from '../Error'
 import Card from '@/components/Card'
 import DefaultLayout from '@/layouts/default.tsx'
 import Section from '@/components/Section'
+import {faker} from '@faker-js/faker'
+
 
 interface Game {
     gameId: string;
@@ -23,7 +25,12 @@ export const Catalog: React.FC = () => {
     useEffect(() => {
         axios.get(`${apiUrl}/api/v1/games`)
             .then(response => {
-                setData(response.data)
+                const gamesWithImages = response.data.map((game: Game) => ({
+                    ...game,
+                    imageSrc: faker.image.urlPicsumPhotos({width: 400, height: 300})
+                }))
+                setData(gamesWithImages)
+
             })
             .catch((err) => {
                 console.error('Error fetching data:', err)
@@ -38,12 +45,11 @@ export const Catalog: React.FC = () => {
     }
     return (
         <DefaultLayout>
-            <Section>
+            <Section className="flex flex-col gap-4">
                 <ul>
                     {data.map((game) => (
-                        //TODO: Faker images src
                         <li key={game.gameId}>
-                            <Card title={game.title} description={game.description}/>
+                            <Card title={game.title} description={game.description} imageSrc={game.imageSrc}/>
                         </li>
                     ))}
                 </ul>

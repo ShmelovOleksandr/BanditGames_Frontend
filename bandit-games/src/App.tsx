@@ -20,8 +20,6 @@ function App() {
                     </main>
                 </SecurityContextProvider>
             </div>
-
-
         </Router>
 
     )
