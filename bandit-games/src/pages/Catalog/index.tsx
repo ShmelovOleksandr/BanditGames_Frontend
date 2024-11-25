@@ -2,11 +2,13 @@ import axios from 'axios'
 import {useEffect, useState} from 'react'
 import NotFound from '../Error'
 import DefaultLayout from '@/layouts/default.tsx'
-import Section from '@/components/Section'
 import {faker} from '@faker-js/faker'
 import ReusableCard from '@/components/Card'
 import {Link} from 'react-router-dom'
 import {motion} from 'framer-motion'
+import SectionComponent from '@/components/Section'
+import {subtitle, title} from '@/components/primitives.ts'
+import SearchInput from '@/components/Search'
 
 
 interface Game {
@@ -22,6 +24,7 @@ const apiUrl = import.meta.env.VITE_LOCAL_BASE_URL
 export const Catalog: React.FC = () => {
     const [data, setData] = useState<Game[]>([])
     const [error, setError] = useState<string | null>(null)
+    const [searchQuery, setSearchQuery] = useState('')
 
 
     useEffect(() => {
@@ -45,11 +48,19 @@ export const Catalog: React.FC = () => {
             <NotFound error={error}/>
         )
     }
+
+    const filteredGames = data.filter((game) =>
+        game.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+
     return (
         <DefaultLayout>
-            <Section className="flex flex-col gap-4 ">
+            <SectionComponent className="flex flex-col gap-4 ">
+                <p className={title({color: 'white'})}>Game Catalog</p>
+                <p className={subtitle({color: 'muted'})}>Explore our diverse collection of exciting games.</p>
+                <SearchInput value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {data.map((game) => (
+                    {filteredGames.map((game) => (
                         <motion.li key={game.gameId}
                                    whileHover={{scale: 1.1}}>
                             <Link to={`/games?gameId=${game.gameId}`}>
@@ -59,7 +70,7 @@ export const Catalog: React.FC = () => {
                         </motion.li>
                     ))}
                 </ul>
-            </Section>
+            </SectionComponent>
         </DefaultLayout>
     )
 }
