@@ -8,10 +8,8 @@ import {
     NavbarMenuItem,
 } from '@nextui-org/navbar'
 import Button from '@/components/Button/index.tsx'
-import {Kbd} from '@nextui-org/kbd'
 import {Link} from 'react-router-dom'
-
-import {Input} from '@nextui-org/input'
+import SearchInput from '@/components/Search'
 import {link as linkStyles} from '@nextui-org/theme'
 import clsx from 'clsx'
 
@@ -20,31 +18,10 @@ import {
     TwitterIcon,
     GithubIcon,
     DiscordIcon,
-    SearchIcon,
     Logo,
 } from '@/components/icons.tsx'
 
 export const Navigation = () => {
-    const searchInput = (
-        <Input
-            aria-label="Search"
-            classNames={{
-                inputWrapper: 'bg-default-100',
-                input: 'text-sm',
-            }}
-            endContent={
-                <Kbd className="hidden lg:inline-block" keys={['ctrl']}>
-                    K
-                </Kbd>
-            }
-            labelPlacement="outside"
-            placeholder="Search..."
-            startContent={
-                <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0"/>
-            }
-            type="search"
-        />
-    )
 
     return (
         <NextUINavbar maxWidth="xl" position="sticky">
@@ -89,7 +66,8 @@ export const Navigation = () => {
                         <GithubIcon className="text-default-500"/>
                     </Link>
                 </NavbarItem>
-                <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
+                <NavbarItem className="hidden lg:flex">
+                </NavbarItem>
                 <NavbarItem className="hidden md:flex">
                     <Button link={siteConfig.links.login} text="Log In"/>
                 </NavbarItem>
@@ -104,7 +82,6 @@ export const Navigation = () => {
             </NavbarContent>
 
             <NavbarMenu>
-                {searchInput}
                 <div className="mx-4 mt-2 flex flex-col gap-2">
                     {siteConfig.navItems.map((item, index) => (
                         <NavbarMenuItem key={`${item}-${index}`}>
