@@ -1,19 +1,18 @@
 import {
     Navbar as NextUINavbar,
-    NavbarContent,
-    NavbarMenu,
-    NavbarMenuToggle,
     NavbarBrand,
+    NavbarContent,
     NavbarItem,
+    NavbarMenu,
     NavbarMenuItem,
+    NavbarMenuToggle,
 } from '@nextui-org/navbar'
-import Button from '@/components/Button/index.tsx'
 import {Link} from 'react-router-dom'
-import SearchInput from '@/components/Search'
-import {link as linkStyles} from '@nextui-org/theme'
 import clsx from 'clsx'
 
 import {siteConfig} from '@/config/site'
+import {useContext} from 'react'
+import SecurityContext from '@/context/SecurityContext'
 import {
     TwitterIcon,
     GithubIcon,
@@ -22,27 +21,32 @@ import {
 } from '@/components/icons.tsx'
 
 export const Navigation = () => {
+    const {isAuthenticated, login, logout, loggedInUser} = useContext(SecurityContext)
+    console.log(isAuthenticated)
+    console.log(loggedInUser)
+
 
     return (
         <NextUINavbar maxWidth="xl" position="sticky">
+            {/* Brand Section */}
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit">
-                    <Link to="/" className="flex justify-start items-center gap-1" href="/">
+                    <Link to="/" className="flex justify-start items-center gap-1">
                         <Logo color="#310150"/>
-                        <p className="font-bold bg-gradient-to-r from-secondary-200 via-secondary-500 to-secondary-600 text-transparent bg-clip-text">BANDIT
-                            GAMES</p>
+                        <p className="font-bold bg-gradient-to-r from-secondary-200 via-secondary-500 to-secondary-600 text-transparent bg-clip-text">
+                            BANDIT GAMES
+                        </p>
                     </Link>
                 </NavbarBrand>
                 <div className="hidden lg:flex gap-4 justify-start ml-2">
                     {siteConfig.navItems.map((item) => (
                         <NavbarItem key={item.href}>
-                            <Link to={`/${item.href}`}
-                                  className={clsx(
-                                      linkStyles({color: 'foreground'}),
-                                      'data-[active=true]:text-primary data-[active=true]:font-medium',
-                                  )}
-                                  color="foreground"
-                                  href={item.href}
+                            <Link
+                                to={`/${item.href}`}
+                                className={clsx(
+                                    'text-default-600 hover:text-primary',
+                                    'data-[active=true]:text-primary data-[active=true]:font-medium',
+                                )}
                             >
                                 {item.label}
                             </Link>
@@ -51,51 +55,59 @@ export const Navigation = () => {
                 </div>
             </NavbarContent>
 
-            <NavbarContent
-                className="hidden sm:flex basis-1/5 sm:basis-full"
-                justify="end"
-            >
+            {/* Social Links and Search */}
+            <NavbarContent className="hidden sm:flex basis-1/5 sm:basis-full" justify="end">
                 <NavbarItem className="hidden sm:flex gap-2">
-                    <Link isExternal to={siteConfig.links.twitter} title="Twitter">
+                    <Link to={siteConfig.links.twitter} target="_blank" title="Twitter">
                         <TwitterIcon className="text-default-500"/>
                     </Link>
-                    <Link isExternal to={siteConfig.links.instagram} title="Instagram">
+                    <Link to={siteConfig.links.instagram} target="_blank" title="Instagram">
                         <DiscordIcon className="text-default-500"/>
                     </Link>
-                    <Link isExternal to={siteConfig.links.github} title="GitHub">
+                    <Link to={siteConfig.links.github} target="_blank" title="GitHub">
                         <GithubIcon className="text-default-500"/>
                     </Link>
                 </NavbarItem>
+
+                {/* Log In / Log Out Button */}
                 <NavbarItem className="hidden lg:flex">
                 </NavbarItem>
                 <NavbarItem className="hidden md:flex">
-                    <Button link={siteConfig.links.login} text="Log In"/>
+                    {!isAuthenticated() ? (
+                        <a
+                            href={siteConfig.links.login}
+                            className="px-4 py-2 text-white bg-purple-950 rounded hover:bg-purple-700"
+                            onClick={login}
+                        >
+                            Log In
+                        </a>
+                    ) : (
+                        <NavbarItem>
+                            <button
+                                onClick={logout}
+                                className="px-4 py-2 text-purple-950 bg-purple-400 rounded hover:bg-purple-700"
+                            >
+                                Log Out
+                            </button>
+                        </NavbarItem>
+                    )}
                 </NavbarItem>
             </NavbarContent>
 
-
+            {/* Mobile Menu */}
             <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-                <Link isExternal to={siteConfig.links.github}>
+                <Link to={siteConfig.links.github} target="_blank">
                     <GithubIcon className="text-default-500"/>
                 </Link>
                 <NavbarMenuToggle/>
             </NavbarContent>
 
+            {/* Mobile Navigation */}
             <NavbarMenu>
                 <div className="mx-4 mt-2 flex flex-col gap-2">
                     {siteConfig.navItems.map((item, index) => (
                         <NavbarMenuItem key={`${item}-${index}`}>
-                            <Link to={'/' + `${item}`}
-                                  color={
-                                      index === 2
-                                          ? 'primary'
-                                          : index === siteConfig.navItems.length - 1
-                                              ? 'danger'
-                                              : 'foreground'
-                                  }
-                                  href="#"
-                                  size="lg"
-                            >
+                            <Link to={`/${item.href}`} className="text-default-600">
                                 {item.label}
                             </Link>
                         </NavbarMenuItem>

@@ -7,6 +7,7 @@ import {generateFakeUsers} from '@/components/fakeUsersGenerator.tsx'
 import SectionComponent from '@/components/Section/index.tsx'
 import {motion} from 'framer-motion'
 import ButtonComponent from '@/components/Button'
+import {Link} from 'react-router-dom'
 
 export const Home: React.FC = () => {
     const fakeUsers = generateFakeUsers(9)
@@ -32,7 +33,7 @@ export const Home: React.FC = () => {
                         recommendations tailored just for you. Track your progress, connect
                         with friends, and enjoy endless gaming possibilities.
                     </p>
-                    <ButtonComponent link={siteConfig.links.login} text="Play"/>
+                    <ButtonComponent link={siteConfig.links.library} text="Play"/>
                 </div>
 
             </SectionComponent>

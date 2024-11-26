@@ -9,7 +9,6 @@ import {faker} from '@faker-js/faker'
 import {Progress, Skeleton, Tooltip} from '@nextui-org/react'
 import {Server} from 'mock-socket'
 import {Button} from '@nextui-org/button'
-import { motion } from 'framer-motion'
 
 
 const mockServerUrl = 'ws://localhost:5173/games/lobby'
