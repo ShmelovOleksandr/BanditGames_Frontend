@@ -10,10 +10,9 @@ export function RouteGuard({ children }: RouteGuardProps) {
     const {isAuthenticated, login} = useContext(SecurityContext)
 
     if (isAuthenticated()) {
-        return <>{children}</> // Render the protected content
+        return <>{children}</> // Render protected content
     } else {
-        // Redirect to the Keycloak login page
-        login()
-        return <Navigate to="/" replace /> // Ensure user is redirected to the home page
+        login() // Trigger Keycloak login
+        return <Navigate to="/" replace /> // Redirect to home (fallback)
     }
 }
