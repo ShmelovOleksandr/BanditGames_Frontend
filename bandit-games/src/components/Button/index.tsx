@@ -2,7 +2,7 @@ import {Button} from '@nextui-org/button'
 import {useNavigate} from 'react-router-dom'
 
 interface ButtonType {
-    link: string;
+    link?: string;
     text: string;
 }
 

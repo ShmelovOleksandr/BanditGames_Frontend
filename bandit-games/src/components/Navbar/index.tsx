@@ -7,41 +7,24 @@ import {
     NavbarMenuItem,
     NavbarMenuToggle,
 } from '@nextui-org/navbar'
-import {Input} from '@nextui-org/input'
 import {Link} from 'react-router-dom'
-import {Kbd} from '@nextui-org/kbd'
 import clsx from 'clsx'
 
 import {siteConfig} from '@/config/site'
-import {DiscordIcon, GithubIcon, Logo, SearchIcon, TwitterIcon,} from '@/components/icons.tsx'
 import {useContext} from 'react'
 import SecurityContext from '@/context/SecurityContext'
+import {
+    TwitterIcon,
+    GithubIcon,
+    DiscordIcon,
+    Logo,
+} from '@/components/icons.tsx'
 
 export const Navigation = () => {
     const {isAuthenticated, login, logout, loggedInUser} = useContext(SecurityContext)
     console.log(isAuthenticated)
     console.log(loggedInUser)
 
-    const searchInput = (
-        <Input
-            aria-label="Search"
-            classNames={{
-                inputWrapper: 'bg-default-100',
-                input: 'text-sm',
-            }}
-            endContent={
-                <Kbd className="hidden lg:inline-block" keys={['ctrl']}>
-                    K
-                </Kbd>
-            }
-            labelPlacement="outside"
-            placeholder="Search..."
-            startContent={
-                <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0"/>
-            }
-            type="search"
-        />
-    )
 
     return (
         <NextUINavbar maxWidth="xl" position="sticky">
@@ -85,9 +68,10 @@ export const Navigation = () => {
                         <GithubIcon className="text-default-500"/>
                     </Link>
                 </NavbarItem>
-                <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
 
                 {/* Log In / Log Out Button */}
+                <NavbarItem className="hidden lg:flex">
+                </NavbarItem>
                 <NavbarItem className="hidden md:flex">
                     {!isAuthenticated() ? (
                         <a
@@ -120,7 +104,6 @@ export const Navigation = () => {
 
             {/* Mobile Navigation */}
             <NavbarMenu>
-                {searchInput}
                 <div className="mx-4 mt-2 flex flex-col gap-2">
                     {siteConfig.navItems.map((item, index) => (
                         <NavbarMenuItem key={`${item}-${index}`}>
@@ -134,4 +117,3 @@ export const Navigation = () => {
         </NextUINavbar>
     )
 }
-

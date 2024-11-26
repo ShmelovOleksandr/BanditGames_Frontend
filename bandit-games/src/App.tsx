@@ -2,8 +2,11 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import './App.css'
 import {Home} from '@/pages/Home'
 import {Catalog} from '@/pages/Catalog'
+import './App.css'
+import SecurityContextProvider from './context/SecurityContextProvider'
+import GameDetails from '@/pages/Game'
+import Lobby from '@/pages/Lobby'
 import {RouteGuard} from './components/RouteGuard'
-import SecurityContextProvider from '@/context/SecurityContextProvider.tsx'
 
 
 function App() {
@@ -22,6 +25,8 @@ function App() {
                             </RouteGuard>
                         }
                     />
+                    <Route path="/games" element={<GameDetails/>}/>
+                    <Route path="/games/lobby" element={<Lobby/>}/>
                 </Routes>
             </BrowserRouter>
         </SecurityContextProvider>

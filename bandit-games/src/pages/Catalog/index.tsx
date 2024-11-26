@@ -1,9 +1,16 @@
 import axios from 'axios'
 import {useEffect, useState} from 'react'
 import NotFound from '../Error'
-import Card from '@/components/Card'
 import DefaultLayout from '@/layouts/default.tsx'
-import Section from '@/components/Section'
+import {faker} from '@faker-js/faker'
+import ReusableCard from '@/components/Card'
+import {Link} from 'react-router-dom'
+import {motion} from 'framer-motion'
+import SectionComponent from '@/components/Section'
+import {subtitle, title} from '@/components/primitives.ts'
+import SearchInput from '@/components/Search'
+import {Divider} from '@nextui-org/react'
+
 
 interface Game {
     gameId: string;
@@ -18,12 +25,18 @@ const apiUrl = import.meta.env.VITE_LOCAL_BASE_URL
 export const Catalog: React.FC = () => {
     const [data, setData] = useState<Game[]>([])
     const [error, setError] = useState<string | null>(null)
+    const [searchQuery, setSearchQuery] = useState('')
 
 
     useEffect(() => {
         axios.get(`${apiUrl}/api/v1/games`)
             .then(response => {
-                setData(response.data)
+                const gamesWithImages = response.data.map((game: Game) => ({
+                    ...game,
+                    imageSrc: faker.image.urlPicsumPhotos({width: 400, height: 300})
+                }))
+                setData(gamesWithImages)
+
             })
             .catch((err) => {
                 console.error('Error fetching data:', err)
@@ -36,18 +49,38 @@ export const Catalog: React.FC = () => {
             <NotFound error={error}/>
         )
     }
+
+    const filteredGames = data.filter((game) =>
+        game.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+
     return (
         <DefaultLayout>
-            <Section>
-                <ul>
-                    {data.map((game) => (
-                        //TODO: Faker images src
-                        <li key={game.gameId}>
-                            <Card title={game.title} description={game.description}/>
-                        </li>
+            <SectionComponent className="flex flex-col gap-4 ">
+                <div className="flex flex-wrap items-center justify-between w-full">
+                    <div>
+                        <p className={title({color: 'white'})}>Game Catalog</p>
+                        <p className={subtitle({color: 'muted'})}>
+                            Explore our diverse collection of exciting games.
+                        </p>
+                    </div>
+                    <div className="mt-4 sm:mt-0">
+                        <SearchInput value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
+                    </div>
+                </div>
+                <hr className="my-4 border-white"></hr>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredGames.map((game) => (
+                        <motion.li key={game.gameId}
+                                   whileHover={{scale: 1.1}}>
+                            <Link to={`/games?gameId=${game.gameId}`}>
+                                <ReusableCard title={game.title} description={game.description}
+                                              imageSrc={game.imageSrc}/>
+                            </Link>
+                        </motion.li>
                     ))}
                 </ul>
-            </Section>
+            </SectionComponent>
         </DefaultLayout>
     )
 }
