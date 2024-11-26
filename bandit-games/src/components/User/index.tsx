@@ -2,7 +2,7 @@ import {User} from '@nextui-org/react'
 
 interface UserProps {
     name: string;
-    description: React.ReactNode;
+    description?: React.ReactNode;
     avatarSrc: string;
 }
 
