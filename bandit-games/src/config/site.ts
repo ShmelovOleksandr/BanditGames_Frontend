@@ -9,11 +9,11 @@ export const siteConfig = {
         },
         {
             label: 'Game Library',
-            href: '/game-library',
+            href: 'game-library',
         },
         {
             label: 'My Account',
-            href: '/my-account',
+            href: 'my-account',
         },
 
     ],
@@ -23,6 +23,7 @@ export const siteConfig = {
         twitter: 'https://twitter.com/getnextui',
         instagram: '#',
         docs: 'https://nextui.org',
-        login: '#',
+        login: `${import.meta.env.VITE_KC_URL}/realms/${encodeURIComponent(import.meta.env.VITE_KC_REALM)}/protocol/openid-connect/auth?client_id=${encodeURIComponent(import.meta.env.VITE_KC_CLIENT_ID)}&redirect_uri=${encodeURIComponent(import.meta.env.VITE_REACT_APP_URL)}&response_type=code`,
+        library: '/game-library'
     },
 }
