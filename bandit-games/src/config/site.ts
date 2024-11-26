@@ -23,6 +23,6 @@ export const siteConfig = {
         twitter: 'https://twitter.com/getnextui',
         instagram: '#',
         docs: 'https://nextui.org',
-        login: '#',
+        login: `${import.meta.env.VITE_KC_URL}/realms/${encodeURIComponent(import.meta.env.VITE_KC_REALM)}/protocol/openid-connect/auth?client_id=${encodeURIComponent(import.meta.env.VITE_KC_CLIENT_ID)}&redirect_uri=${encodeURIComponent(import.meta.env.VITE_REACT_APP_URL)}&response_type=code`,
     },
 }

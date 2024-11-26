@@ -1,28 +1,35 @@
 import { ReactNode, useEffect, useState } from 'react'
 import SecurityContext from './SecurityContext'
-import keycloak from './keycloak'
-import { addAccessTokenToAuthHeader, removeAccessTokenFromAuthHeader } from '../services/auth'
+import { addAccessTokenToAuthHeader, removeAccessTokenFromAuthHeader } from '@/services/auth'
+import {isExpired} from 'react-jwt'
+import Keycloak from 'keycloak-js'
 
 interface IWithChildren {
     children: ReactNode;
 }
 
+const keycloakConfig = {
+    url: import.meta.env.VITE_KC_URL,
+    realm: import.meta.env.VITE_KC_REALM,
+    clientId: import.meta.env.VITE_KC_CLIENT_ID,
+}
+
+const keycloak: Keycloak = new Keycloak(keycloakConfig)
+
+
 export default function SecurityContextProvider({ children }: IWithChildren) {
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [setIsAuthenticated] = useState(false)
     const [loggedInUser, setLoggedInUser] = useState<string | undefined>(undefined)
     const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
-        if (!isInitialized) {
             keycloak
-                .init({ onLoad: 'login-required' })
+                .init({ onLoad: 'check-sso' })
                 .then((authenticated) => {
                     if (authenticated) {
                         addAccessTokenToAuthHeader(keycloak.token)
                         setLoggedInUser(keycloak.idTokenParsed?.given_name)
                         setIsAuthenticated(true)
-                    } else {
-                        keycloak.login()
                     }
                     setIsInitialized(true)
                 })
@@ -30,8 +37,7 @@ export default function SecurityContextProvider({ children }: IWithChildren) {
                     console.error('Keycloak initialization failed:', error)
                     setIsInitialized(true) // Avoid infinite loading
                 })
-        }
-    }, [isInitialized])
+    }, [])
 
     keycloak.onAuthSuccess = () => {
         addAccessTokenToAuthHeader(keycloak.token)
@@ -40,8 +46,6 @@ export default function SecurityContextProvider({ children }: IWithChildren) {
 
     keycloak.onAuthLogout = () => {
         removeAccessTokenFromAuthHeader()
-        setLoggedInUser(undefined)
-        setIsAuthenticated(false)
     }
 
     keycloak.onTokenExpired = () => {
@@ -53,6 +57,11 @@ export default function SecurityContextProvider({ children }: IWithChildren) {
 
     const login = () => keycloak.login()
     const logout = () => keycloak.logout({ redirectUri: import.meta.env.VITE_REACT_APP_URL })
+
+    function isAuthenticated() {
+        if (keycloak.token) return !isExpired(keycloak.token)
+        else return false
+    }
 
     if (!isInitialized) {
         return <div>Loading...</div> // Placeholder during initialization

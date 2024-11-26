@@ -91,7 +91,12 @@ export const Navigation = () => {
                 </NavbarItem>
                 <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
                 <NavbarItem className="hidden md:flex">
-                    <Button link={siteConfig.links.login} text="Log In"/>
+                    <a
+                        href={siteConfig.links.login}
+                        className="px-4 py-2 text-white bg-purple-950 rounded hover:bg-blue-700"
+                    >
+                        Log In
+                    </a>
                 </NavbarItem>
             </NavbarContent>
 

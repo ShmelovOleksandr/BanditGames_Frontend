@@ -1,29 +1,30 @@
-import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
+import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import './App.css'
 import {Home} from '@/pages/Home'
 import {Catalog} from '@/pages/Catalog'
-import './App.css'
-import SecurityContextProvider from './context/SecurityContextProvider'
+import {RouteGuard} from './components/RouteGuard'
+import SecurityContextProvider from '@/context/SecurityContextProvider.tsx'
 
 
 function App() {
     return (
-        <Router>
-            <div>
-                <SecurityContextProvider>
-
-                    <main>
-                        <Routes>
-                            <Route path="/" element={<Home/>}/>
-                            <Route path="/game-library" element={<Catalog/>}/>
-                        </Routes>
-                    </main>
-                </SecurityContextProvider>
-            </div>
-
-
-        </Router>
-
+        <SecurityContextProvider>
+            <BrowserRouter>
+                <Routes>
+                    {/* Public Route */}
+                    <Route path="/" element={<Home/>}/>
+                    {/* Protected Route */}
+                    <Route
+                        path="/game-library"
+                        element={
+                            <RouteGuard>
+                                <Catalog/>
+                            </RouteGuard>
+                        }
+                    />
+                </Routes>
+            </BrowserRouter>
+        </SecurityContextProvider>
     )
 }
 
