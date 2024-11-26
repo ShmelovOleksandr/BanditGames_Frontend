@@ -1,13 +1,14 @@
 import {ReactNode} from 'react'
 import {Navigation} from '@/components/Navbar'
 
-interface LobbyLayoutProps {
+interface AccountLayoutProps {
     leftSidebar: ReactNode;
+
     mainContent: ReactNode;
     rightSidebar: ReactNode;
 }
 
-const LobbyLayout: React.FC<LobbyLayoutProps> = ({leftSidebar, mainContent, rightSidebar}) => {
+const AccountLayout: React.FC<AccountLayoutProps> = ({leftSidebar, mainContent, rightSidebar}) => {
     return (
         <>
             <Navigation/>
@@ -25,4 +26,4 @@ const LobbyLayout: React.FC<LobbyLayoutProps> = ({leftSidebar, mainContent, righ
     )
 }
 
-export default LobbyLayout
+export default AccountLayout
