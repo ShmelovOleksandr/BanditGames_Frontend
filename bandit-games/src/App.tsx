@@ -7,6 +7,7 @@ import SecurityContextProvider from './context/SecurityContextProvider'
 import GameDetails from '@/pages/Game'
 import Lobby from '@/pages/Lobby'
 import {RouteGuard} from './components/RouteGuard'
+import MyAccount from '@/pages/account'
 
 
 function App() {
@@ -27,6 +28,14 @@ function App() {
                     />
                     <Route path="/games" element={<GameDetails/>}/>
                     <Route path="/games/lobby" element={<Lobby/>}/>
+                    <Route
+                        path="/my-account"
+                        element={
+                            <RouteGuard>
+                                <MyAccount />
+                            </RouteGuard>
+                        }
+                    />
                 </Routes>
             </BrowserRouter>
         </SecurityContextProvider>
