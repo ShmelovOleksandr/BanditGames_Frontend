@@ -1,162 +1,64 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import SecurityContext from '@/context/SecurityContext'
 
-interface UserAttributes {
-    username: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    age: number | '';
-    gender: string;
-    country: string;
-    city: string;
-}
-
 const MyAccount: React.FC = () => {
-    const { userInfo, isAuthenticated, login } = useContext(SecurityContext)
-    const [attributes, setAttributes] = useState<UserAttributes>({
-        username: '',
-        email: '',
-        firstName: '',
-        lastName: '',
-        age: '',
-        gender: '',
-        country: '',
-        city: '',
-    })
+    const { userInfo, logout } = useContext(SecurityContext)
+    const navigate = useNavigate()
 
-    const [isLoading, setIsLoading] = useState(true)
-
-    useEffect(() => {
-        if (!isAuthenticated()) {
-            login()
-            return
-        }
-
-        if (userInfo) {
-            setAttributes({
-                username: userInfo.preferred_username || '',
-                email: userInfo.email || '',
-                firstName: userInfo.given_name || '',
-                lastName: userInfo.family_name || '',
-                age: userInfo.age || '',
-                gender: userInfo.gender || '',
-                country: userInfo.country || '',
-                city: userInfo.city || '',
-            })
-        }
-
-        setIsLoading(false)
-    }, [isAuthenticated, login, userInfo])
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target
-        setAttributes((prev) => ({
-            ...prev,
-            [name]: value,
-        }))
-    }
-    const handleSave = async () => {
-        try {
-            // Fetch the admin token
-            const adminTokenResponse = await fetch(`${import.meta.env.VITE_KC_URL}/realms/master/protocol/openid-connect/token`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    client_id: import.meta.env.VITE_KC_ADMIN_CLIENT_ID,
-                    client_secret: import.meta.env.VITE_KC_ADMIN_CLIENT_SECRET,
-                    grant_type: 'client_credentials',
-                }),
-            })
-
-            if (!adminTokenResponse.ok) {
-                throw new Error(`Failed to fetch admin token: ${adminTokenResponse.statusText}`)
-            }
-
-            const adminTokenData = await adminTokenResponse.json()
-            const adminToken = adminTokenData.access_token
-
-            // Update user attributes in Keycloak
-            const userId = userInfo?.sub // Assuming 'sub' contains the user's ID
-            const response = await fetch(`${import.meta.env.VITE_KC_URL}/admin/realms/${import.meta.env.VITE_KC_REALM}/users/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${adminToken}`,
-                },
-                body: JSON.stringify({
-                    username: attributes.username,
-                    email: attributes.email,
-                    firstName: attributes.firstName,
-                    lastName: attributes.lastName,
-                    attributes: {
-                        age: [String(attributes.age)], // Custom attributes must be arrays
-                        gender: [attributes.gender],
-                        country: [attributes.country],
-                        city: [attributes.city],
-                    },
-                }),
-            })
-
-            if (!response.ok) {
-                throw new Error(`Failed to update user in Keycloak: ${response.statusText}`)
-            }
-
-            alert('Your changes have been saved.')
-        } catch (error) {
-            console.error('Error saving user data to Keycloak:', error)
-            alert('Failed to save changes.')
-        }
-    }
-
-    if (isLoading) {
-        return <div>Loading...</div>
-    }
+    const menuItems = [
+        { title: 'Personal Information', icon: '👤', action: () => navigate('/personal-info') },
+        { title: 'Change Password', icon: '🔒', action: () => navigate('/change-password') },
+        { title: 'Logout', icon: '🚪', action: logout },
+    ]
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6">My Account</h1>
-            <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-                <form>
-                    {Object.entries(attributes).map(([key, value]) => (
-                        <div className="mb-4" key={key}>
-                            <label className="block text-sm font-medium text-gray-700" htmlFor={key}>
-                                {key.charAt(0).toUpperCase() + key.slice(1)}
-                            </label>
-                            {key === 'gender' ? (
-                                <select
-                                    id={key}
-                                    name={key}
-                                    value={value}
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                                >
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            ) : (
-                                <input
-                                    type={key === 'age' ? 'number' : 'text'}
-                                    id={key}
-                                    name={key}
-                                    value={value}
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                                />
-                            )}
+        <div className="flex h-screen bg-purple-1000 text-white">
+            {/* Sidebar */}
+            <aside className="w-1/6 bg-purple-900 shadow-lg p-6">
+                <h2 className="text-xl font-semibold mb-8">Dashboard</h2>
+                <nav className="flex flex-col gap-4">
+                    {menuItems.map((item, index) => (
+                        <button
+                            key={index}
+                            onClick={item.action}
+                            className="flex items-center gap-2 text-white font-medium hover:text-blue-300"
+                        >
+                            <span>{item.icon}</span> {item.title}
+                        </button>
+                    ))}
+
+                    <button
+                        onClick={() => navigate('/')}
+                        className="flex items-center gap-2 text-white font-medium hover:text-blue-300"
+                    >
+                        <span>🔙</span> Go Back
+                    </button>
+                </nav>
+            </aside>
+
+            {/* Main Content */}
+            <main className="flex-1 p-10">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-3xl font-bold">
+                        Welcome back, {userInfo?.given_name || 'User'}!
+                    </h1>
+                </div>
+
+                {/* Card Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {menuItems.map((item, index) => (
+                        <div
+                            key={index}
+                            onClick={item.action}
+                            className="flex flex-col items-center justify-center p-8 bg-purple-700 shadow-md rounded-lg hover:bg-purple-600 cursor-pointer transition"
+                        >
+                            <div className="text-4xl mb-4">{item.icon}</div>
+                            <h2 className="text-lg font-semibold">{item.title}</h2>
                         </div>
                     ))}
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                        Save Changes
-                    </button>
-                </form>
-            </div>
+                </div>
+            </main>
         </div>
     )
 }
