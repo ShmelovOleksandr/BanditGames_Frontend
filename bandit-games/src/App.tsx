@@ -17,15 +17,8 @@ function App() {
                     {/* Public Route */}
                     <Route path="/" element={<Home/>}/>
                     {/* Protected Route */}
-                    <Route
-                        path="/game-library"
-                        element={
-                            <RouteGuard>
-                                <Catalog/>
-                            </RouteGuard>
-                        }
-                    />
-                    <Route path="/games" element={<GameDetails/>}/>
+                    <Route path="/game-library" element={<Catalog/>}/>
+                    <Route path="/game-library/game/:id" element={<GameDetails/>}/>
                     <Route path="/games/lobby" element={<Lobby/>}/>
                 </Routes>
             </BrowserRouter>
