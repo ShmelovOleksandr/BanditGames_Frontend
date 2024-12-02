@@ -1,75 +1,68 @@
 import {useState} from 'react'
 import {Client} from '@stomp/stompjs'
+import {useKeycloak} from '@/hooks/useKeyCloak.ts'
 
-const useWebSocket = (keycloak) => {
+const useWebSocket = (keycloakInstance) => {
     const [stompClient, setStompClient] = useState(null)
     const [messages, setMessages] = useState([])
     const [lobbyId, setLobbyId] = useState(null)
+    const { keycloak } = useKeycloak()
 
     const connectWebSocket = () => {
-        if (!keycloak || !keycloak.authenticated) {
+        if (!keycloakInstance || !keycloakInstance.authenticated) {
             console.log('User is not authenticated.')
             return
         }
 
-        // Use the user ID from Keycloak token for the subscription path
-        const userId = keycloak.tokenParsed?.sub  // Assuming the Keycloak token has the 'sub' field as user ID
-        console.log(`User id: ${userId}`)
-        // Construct WebSocket URL
+        const token = keycloakInstance.token
+        const userId = keycloakInstance.tokenParsed?.sub
 
-        // Initialize the Stomp client with the SockJS client as the WebSocket factory
         const client = new Client({
             brokerURL: 'ws://localhost:8041/ws',
             connectHeaders: {
-                Authorization: `Bearer ${keycloak.token}` // Adding Keycloak JWT token for authentication
+                Authorization: `Bearer ${token}`,
             },
-            debug: (str) => console.log(str),  // Optional: for debugging stompjs logs
+            debug: (str) => console.log(str),
             onConnect: () => {
                 console.log('WebSocket connected!')
-                console.log(`Sub path /queue/user/${userId}`)
-                // Subscribe to the specific user queue using the user ID in the path
                 client.subscribe(`/queue/user/${userId}`, (message) => {
                     const receivedMessage = JSON.parse(message.body)
-                    console.log('Received message: ', JSON.parse(message.body))
-                    if (receivedMessage.lobbyId) {
-                        setLobbyId(receivedMessage.lobbyId)
-                    }
-                    setMessages((prevMessages) => [...prevMessages, JSON.parse(message.body)])
+                    setMessages((prev) => [...prev, receivedMessage])
+                    if (receivedMessage.lobbyId) setLobbyId(receivedMessage.lobbyId)
                 })
             },
             onStompError: (frame) => {
-                console.error('Broker reported error: ' + frame.headers['message'])
-                console.error('Additional details: ' + frame.body)
+                console.error('Broker reported error:', frame.headers['message'])
+                console.error('Additional details:', frame.body)
             },
             onWebSocketError: (error) => {
-                console.error('Error with websocket', error)
-            }
+                console.error('WebSocket error:', error)
+            },
         })
-        client.activate() // Instead of using 'connect()', you now use 'activate()'
-
-        // Set the stomp client in state
+        client.activate()
         setStompClient(client)
     }
 
     const disconnectWebSocket = () => {
         if (stompClient) {
             stompClient.deactivate()
-
             console.log('WebSocket disconnected!')
         }
     }
 
-    const sendJoinLobbyRequest = (gameId: string) => {
+    const sendJoinLobbyRequest = (gameId) => {
         if (!stompClient || !stompClient.connected) {
             console.log('WebSocket is not connected!')
             return
         }
-        if (!keycloak || !keycloak.authenticated) {
+        if (!keycloakInstance || !keycloakInstance.authenticated) {
             console.log('User is not authenticated.')
             return
         }
-        const playerId = keycloak.tokenParsed?.sub
-        const payload = {playerId, gameId}
+        const payload = {
+            playerId: keycloakInstance.tokenParsed?.sub,
+            gameId,
+        }
         stompClient.publish({
             destination: '/app/join-lobby',
             body: JSON.stringify(payload),
@@ -123,6 +116,7 @@ const useWebSocket = (keycloak) => {
         sendLeaveLobbyRequest,
         sendReadyToPlayRequest,
     }
+
 }
 
 export default useWebSocket
