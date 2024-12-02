@@ -17,7 +17,7 @@ const keycloakConfig = {
 const keycloak = new Keycloak(keycloakConfig)
 
 export default function SecurityContextProvider({ children }: IWithChildren) {
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [authState, setAuthState] = useState(() => keycloak.authenticated || false)
     const [loggedInUser, setLoggedInUser] = useState<string | undefined>(undefined)
     const [userInfo, setUserInfo] = useState<any>(null) // State for storing user info
     const [isInitialized, setIsInitialized] = useState(false)
@@ -29,14 +29,16 @@ export default function SecurityContextProvider({ children }: IWithChildren) {
                 if (authenticated) {
                     addAccessTokenToAuthHeader(keycloak.token)
                     setLoggedInUser(keycloak.idTokenParsed?.given_name)
-                    await fetchUserInfo(keycloak.token) // Fetch user info from endpoint
-                    setIsAuthenticated(true)
+                    await fetchUserInfo(keycloak.token)
+                    setAuthState(true) // Update auth state
+                } else {
+                    setAuthState(false) // Update auth state
                 }
                 setIsInitialized(true)
             })
             .catch((error) => {
                 console.error('Keycloak initialization failed:', error)
-                setIsInitialized(true) // Avoid infinite loading
+                setIsInitialized(true)
             })
     }, [])
 
@@ -73,7 +75,8 @@ export default function SecurityContextProvider({ children }: IWithChildren) {
 
     keycloak.onAuthLogout = () => {
         removeAccessTokenFromAuthHeader()
-        setUserInfo(null) // Clear user info on logout
+        setUserInfo(null)
+        setAuthState(false) // Update auth state on logout
     }
 
     keycloak.onTokenExpired = () => {
@@ -102,12 +105,12 @@ export default function SecurityContextProvider({ children }: IWithChildren) {
     return (
         <SecurityContext.Provider
             value={{
-                isAuthenticated: checkIsAuthenticated,
+                isAuthenticated: authState, // Now using the state directly
                 loggedInUser,
                 userInfo,
                 login,
                 logout,
-                keycloak, // Pass the keycloak object here
+                keycloak,
             }}
         >
             {children}

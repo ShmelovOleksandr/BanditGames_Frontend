@@ -35,7 +35,7 @@ const PersonalInfo: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        if (!isAuthenticated()) {
+        if (!isAuthenticated) {
             login()
             return
         }
