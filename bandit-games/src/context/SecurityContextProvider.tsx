@@ -2,10 +2,9 @@ import {ReactNode, useEffect, useState} from 'react'
 import SecurityContext from './SecurityContext'
 import {addAccessTokenToAuthHeader, removeAccessTokenFromAuthHeader} from '@/services/auth'
 import Keycloak from 'keycloak-js'
-import {isExpired} from 'react-jwt'
 
 interface IWithChildren {
-    children: ReactNode
+    children: ReactNode;
 }
 
 const keycloakConfig = {
@@ -41,7 +40,6 @@ export const initializeKeycloak = (onInitCompleteCallback) => {
     return keycloak
 }
 
-
 export const logoutKeycloak = () => {
     if (keycloak) {
         keycloak.logout({redirectUri: import.meta.env.VITE_REACT_APP_URL})
@@ -49,17 +47,14 @@ export const logoutKeycloak = () => {
 }
 
 export default function SecurityContextProvider({children}: IWithChildren) {
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [loggedInUser, setLoggedInUser] = useState<string | undefined>(undefined)
     const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
         initializeKeycloak((authenticatedKeycloak) => {
             if (authenticatedKeycloak) {
-                setIsAuthenticated(true)
                 setLoggedInUser(authenticatedKeycloak.tokenParsed?.preferred_username)
             } else {
-                setIsAuthenticated(false)
                 setLoggedInUser(undefined)
             }
             setIsInitialized(true)
@@ -73,7 +68,6 @@ export default function SecurityContextProvider({children}: IWithChildren) {
         keycloak.onAuthLogout = () => {
             removeAccessTokenFromAuthHeader()
             setLoggedInUser(undefined)
-            setIsAuthenticated(false)
         }
 
         keycloak.onTokenExpired = () => {
@@ -84,12 +78,11 @@ export default function SecurityContextProvider({children}: IWithChildren) {
         }
     }, [])
 
-
     const login = () => keycloak.login()
     const logout = () => logoutKeycloak()
 
     const isUserAuthenticated = () => {
-        return keycloak?.token ? !isExpired(keycloak.token) : false
+        return keycloak.authenticated
     }
 
     if (!isInitialized) {
@@ -99,11 +92,11 @@ export default function SecurityContextProvider({children}: IWithChildren) {
     return (
         <SecurityContext.Provider
             value={{
-                isAuthenticated: isUserAuthenticated(),
+                isAuthenticated: isUserAuthenticated,
                 loggedInUser,
                 login,
                 logout,
-                keycloak,
+                isInitialized,
             }}
         >
             {children}
