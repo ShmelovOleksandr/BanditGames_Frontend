@@ -1,18 +1,21 @@
-import { ReactNode, useContext } from 'react'
-import SecurityContext from '@/context/SecurityContext.ts'
-import { Navigate } from 'react-router-dom'
+import {ReactNode, useContext} from 'react'
+import SecurityContext from '@/context/SecurityContext'
 
 export interface RouteGuardProps {
     children: ReactNode;
 }
 
-export function RouteGuard({ children }: RouteGuardProps) {
-    const {isAuthenticated, login} = useContext(SecurityContext)
+export function RouteGuard({children}: RouteGuardProps) {
+    const {isAuthenticated, login, isInitialized} = useContext(SecurityContext)
+
+    if (!isInitialized) {
+        return <div>Loading...</div>
+    }
 
     if (isAuthenticated()) {
-        return <>{children}</> // Render protected content
+        return <>{children}</>
     } else {
-        login() // Trigger Keycloak login
-        return <Navigate to="/" replace /> // Redirect to home (fallback)
+        login()
+        return null
     }
 }
