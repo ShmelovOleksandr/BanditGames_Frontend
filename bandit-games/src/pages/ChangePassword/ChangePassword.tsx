@@ -16,7 +16,7 @@ const ChangePassword: React.FC = () => {
     const handlePasswordChange = async () => {
         setError('')
         setSuccess('')
-        if (!isAuthenticated()) {
+        if (!isAuthenticated) {
             login()
             return
         }

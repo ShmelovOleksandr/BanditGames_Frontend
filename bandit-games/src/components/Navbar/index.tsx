@@ -22,7 +22,7 @@ import {
 import {Button} from '@nextui-org/button'
 
 export const Navigation = () => {
-    const {isAuthenticated, login, logout, loggedInUser} = useContext(SecurityContext)
+    const { isAuthenticated, login, logout, loggedInUser } = useContext(SecurityContext)
     console.log(isAuthenticated)
     console.log(loggedInUser)
 
@@ -83,15 +83,12 @@ export const Navigation = () => {
                             Log In
                         </a>
                     ) : (
-                        <NavbarItem>
-                            <Button
-                                onClick={logout}
-                                className="text-sm font-normal text-white bg-secondary-200"
-                                variant="flat"
-                            >
-                                Log Out
-                            </Button>
-                        </NavbarItem>
+                        <Button
+                            onClick={logout}
+                            className="px-4 py-2 text-white bg-purple-950 rounded hover:bg-purple-700"
+                        >
+                            Log Out
+                        </Button>
                     )}
                 </NavbarItem>
             </NavbarContent>
