@@ -2,9 +2,10 @@ import {SearchIcon} from '@/components/icons.tsx'
 import {Input} from '@nextui-org/input'
 
 interface SearchInputProps {
-    value: string;
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    value?: string;
+    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
+
 const SearchInput: React.FC<SearchInputProps> = ({value, onChange}) => {
     return (
         <Input

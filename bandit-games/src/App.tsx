@@ -18,8 +18,8 @@ function App() {
                     <Route path="/" element={<Home/>}/>
                     {/* Protected Route */}
                     <Route path="/game-library" element={<Catalog/>}/>
-                    <Route path="/game-library/game/:id" element={<GameDetails/>}/>
-                    <Route path="/games/lobby" element={<Lobby/>}/>
+                    <Route path="/game-library/game" element={<GameDetails/>}/>
+                    <Route path="/lobby" element={<Lobby/>}/>
                 </Routes>
             </BrowserRouter>
         </SecurityContextProvider>

@@ -1,79 +1,50 @@
 import {Navigation} from '@/components/Navbar'
 import SectionComponent from '@/components/Section'
 import ButtonComponent from '@/components/Button'
-import {useContext, useEffect, useState} from 'react'
+import {useContext, useEffect, useRef, useState} from 'react'
 import {subtitle, title} from '@/components/primitives.ts'
 import User from '@/components/User'
 import SecurityContext from '@/context/SecurityContext'
 import {faker} from '@faker-js/faker'
 import {Progress, Skeleton, Tooltip} from '@nextui-org/react'
-import {Server} from 'mock-socket'
 import {Button} from '@nextui-org/button'
+import {useNavigate, useSearchParams} from 'react-router-dom'
+import {useKeycloak} from '@/hooks/useKeyCloak.ts'
+import useWebSocket from '@/hooks/useWebSocket.ts'
+import {Input} from '@nextui-org/input'
+import SearchInput from '@/components/Search'
 
-
-const mockServerUrl = 'ws://localhost:5173/games/lobby'
 
 export const Lobby: React.FC = () => {
+    const [searchParams, setSearchParams] = useSearchParams()
+    const gameName = searchParams.get('game')
+    const navigate = useNavigate()
+
+
+    const {keycloak} = useKeycloak()
+    const {disconnectWebSocket, sendLeaveLobbyRequest, sendReadyToPlayRequest} = useWebSocket(keycloak)
+    const [isConnected, setIsConnected] = useState(false)  // Track connection status
+    const [isReadyToPlay, setIsReadyToPlay] = useState(false)
+
     const {isAuthenticated, loggedInUser} = useContext(SecurityContext)
     const [players, setPlayers] = useState<string[]>(['Host Player'])
     const [messages, setMessages] = useState([
         {id: 1, sender: 'John', text: 'Hey there!'},
         {id: 2, sender: 'You', text: 'Hi John, how are you?'},
     ])
-    const [newMessage, setNewMessage] = useState('')
-    const [newPlayer, setNewPlayer] = useState('')
 
-    useEffect(() => {
-        const mockServer = new Server(mockServerUrl)
-
-        mockServer.on('connection', (socket) => {
-            socket.on('message', (data) => {
-                const updatedPlayers = JSON.parse(data)
-                setPlayers(updatedPlayers)
-            })
-        })
-
-        return () => {
-            mockServer.stop()
-        }
-    }, [])
-
-    useEffect(() => {
-        const socket = new WebSocket(mockServerUrl)
-
-        socket.onmessage = (event) => {
-            const updatedPlayers = JSON.parse(event.data)
-            setPlayers(updatedPlayers)
-        }
-
-        return () => {
-            socket.close()
-        }
-    }, [])
-
-    const handleAddPlayer = () => {
-        if (newPlayer.trim()) {
-            const updatedPlayers = [...players, newPlayer]
-            setPlayers(updatedPlayers)
-
-            const socket = new WebSocket(mockServerUrl)
-            socket.onopen = () => {
-                socket.send(JSON.stringify(updatedPlayers))
-            }
-
-            setNewPlayer('')
-        }
+    const handleLeaveLobby = () => {
+        sendLeaveLobbyRequest()
+        disconnectWebSocket()
+        setIsConnected(false)
+        navigate('/game-library')
     }
 
-    const handleSendMessage = () => {
-        if (newMessage.trim()) {
-            setMessages((prevMessages) => [
-                ...prevMessages,
-                {id: prevMessages.length + 1, sender: 'You', text: newMessage},
-            ])
-            setNewMessage('')
-        }
+    const handleReadyToPlay = () => {
+        sendReadyToPlayRequest()
+        // navigate('/game')
     }
+
 
     return (
         <>
@@ -82,11 +53,11 @@ export const Lobby: React.FC = () => {
             <SectionComponent className="flex h-screen bg-gray-900 text-white">
                 <main className="flex-grow p-6 bg-secondary-50">
                     <div className="flex justify-between items-center mb-6">
-                        <h1 className={title()}>Checkers</h1>
+                        <h1 className={title()}>{gameName}</h1>
 
                         <Tooltip showArrow={true} placement="left" content="Close lobby and leave the game">
                             <div>
-                                <ButtonComponent link="/game-library" text="Leave"/>
+                                <ButtonComponent link="/game-library" text="Leave" actionClick={handleLeaveLobby}/>
                             </div>
                         </Tooltip>
                     </div>
@@ -148,18 +119,20 @@ export const Lobby: React.FC = () => {
                         </div>
                         {/* Add Player Input */}
                         <div className="mt-4 flex items-center gap-4">
-                            <input
-                                type="text"
-                                value={newPlayer}
-                                onChange={(e) => setNewPlayer(e.target.value)}
-                                placeholder="Search username..."
-                                className="px-4 py-2 bg-gray-700 text-white rounded-md"
-                            />
-                            <Button onClick={handleAddPlayer}
+                            <SearchInput/>
+                            <Button type="button"
                                     className="text-sm font-normal text-default-600 bg-default-100"
                             >
                                 Invite Player
                             </Button>
+                            {players.length === 2 && (
+                                <Button onClick={handleReadyToPlay}
+                                        className="text-sm font-normal text-default-600 bg-default-100">
+                                    Start Game
+                                </Button>
+                            )}
+                        </div>
+                        <div>
 
                         </div>
                     </div>
@@ -184,17 +157,12 @@ export const Lobby: React.FC = () => {
                     </div>
 
                     <div className="mt-4 flex items-center">
-                        <input
-                            type="text"
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
+                        <Input
+                            variant="flat"
                             placeholder="Type a message..."
-                            className="flex-grow px-4 py-2 bg-gray-700 text-white rounded-l-md focus:outline-none"
+                            className="flex-grow px-4 py-2 text-white rounded-l-md focus:outline-none"
                         />
-                        <button onClick={handleSendMessage}
-                                className="px-4 py-2 bg-secondary-800 text-secondary-50 rounded-r-md hover:bg-blue-700">
-                            Send
-                        </button>
+                        <ButtonComponent text="Send"/>
                     </div>
                 </aside>
             </SectionComponent>

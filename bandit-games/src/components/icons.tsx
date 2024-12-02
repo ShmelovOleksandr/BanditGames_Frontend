@@ -1,6 +1,13 @@
 import * as React from 'react'
-import {IconSvgProps} from '@/types'
 import {motion} from 'framer-motion'
+import {SVGProps} from 'react'
+
+export type IconSvgProps = SVGProps<SVGSVGElement> & {
+    size?: number;
+    color?: string;
+    width?: number;
+    height?: number;
+};
 
 const draw = {
     hidden: {pathLength: 0, opacity: 0},

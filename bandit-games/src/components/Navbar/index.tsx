@@ -19,6 +19,7 @@ import {
     DiscordIcon,
     Logo,
 } from '@/components/icons.tsx'
+import {Button} from '@nextui-org/button'
 
 export const Navigation = () => {
     const {isAuthenticated, login, logout, loggedInUser} = useContext(SecurityContext)
@@ -73,7 +74,7 @@ export const Navigation = () => {
                 <NavbarItem className="hidden lg:flex">
                 </NavbarItem>
                 <NavbarItem className="hidden md:flex">
-                    {!isAuthenticated() ? (
+                    {!isAuthenticated ? (
                         <a
                             href={siteConfig.links.login}
                             className="px-4 py-2 text-white bg-purple-950 rounded hover:bg-purple-700"
@@ -83,12 +84,13 @@ export const Navigation = () => {
                         </a>
                     ) : (
                         <NavbarItem>
-                            <button
+                            <Button
                                 onClick={logout}
-                                className="px-4 py-2 text-purple-950 bg-purple-400 rounded hover:bg-purple-700"
+                                className="text-sm font-normal text-white bg-secondary-200"
+                                variant="flat"
                             >
                                 Log Out
-                            </button>
+                            </Button>
                         </NavbarItem>
                     )}
                 </NavbarItem>

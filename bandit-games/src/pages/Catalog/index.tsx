@@ -4,12 +4,14 @@ import NotFound from '../Error'
 import DefaultLayout from '@/layouts/default.tsx'
 import {faker} from '@faker-js/faker'
 import ReusableCard from '@/components/Card'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import {motion} from 'framer-motion'
 import SectionComponent from '@/components/Section'
 import {subtitle, title} from '@/components/primitives.ts'
 import SearchInput from '@/components/Search'
-import {Divider} from '@nextui-org/react'
+import {useKeycloak} from '@/hooks/useKeyCloak.ts'
+import useWebSocket from '@/hooks/useWebSocket.ts'
+import ButtonComponent from '@/components/Button'
 
 
 interface Game {
@@ -23,10 +25,17 @@ interface Game {
 const apiUrl = import.meta.env.VITE_LOCAL_BASE_URL
 
 export const Catalog: React.FC = () => {
+    const navigate = useNavigate()
     const [data, setData] = useState<Game[]>([])
     const [error, setError] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
 
+    const {keycloak} = useKeycloak()
+    const {
+        connectWebSocket,
+        sendJoinLobbyRequest,
+    } = useWebSocket(keycloak)
+    const [isConnected, setIsConnected] = useState(false)
 
     useEffect(() => {
         axios.get(`${apiUrl}/api/v1/games`)
@@ -42,7 +51,26 @@ export const Catalog: React.FC = () => {
                 console.error('Error fetching data:', err)
                 setError('Failed to fetch games. Please try again later.')
             })
-    }, [])
+        if (keycloak?.authenticated) {
+            console.log('Logged in as:', keycloak.tokenParsed?.preferred_username)
+        }
+    }, [keycloak])
+
+    const handleJoinLobby = (gameId: string, title: string) => {
+        if (gameId) {
+            sendJoinLobbyRequest(gameId)
+            navigate(`/lobby?game=${title}`)
+        } else {
+            console.error('Game ID is required!')
+        }
+    }
+
+    const handleQuickMatch = (gameId: string, title: string) => {
+        connectWebSocket()
+        setIsConnected(true)
+        handleJoinLobby(gameId, title)
+    }
+
 
     if (error) {
         return (
@@ -71,13 +99,20 @@ export const Catalog: React.FC = () => {
                 <hr className="my-4 border-white"></hr>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredGames.map((game) => (
-                        <motion.li key={game.gameId}
-                                   whileHover={{scale: 1.1}}>
-                            <Link to={`/games?gameId=${game.gameId}`}>
-                                <ReusableCard title={game.title} description={game.description}
-                                              imageSrc={game.imageSrc}/>
-                            </Link>
-                        </motion.li>
+                        <li key={game.gameId} className="flex flex-col items-start gap-4">
+                            <motion.div whileHover={{scale: 1.1}}>
+                                <Link to={`/game-library/game?gameId=${game.gameId}`}>
+                                    <ReusableCard
+                                        title={game.title}
+                                        description={game.description}
+                                        imageSrc={game.imageSrc}
+                                    />
+                                </Link>
+                            </motion.div>
+                            <ButtonComponent text="Quick Match"
+                                             actionClick={() => handleQuickMatch(game.gameId, game.title)}
+                            />
+                        </li>
                     ))}
                 </ul>
             </SectionComponent>
