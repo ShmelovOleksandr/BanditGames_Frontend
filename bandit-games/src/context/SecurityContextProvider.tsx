@@ -30,9 +30,10 @@ export default function SecurityContextProvider({ children }: IWithChildren) {
                     addAccessTokenToAuthHeader(keycloak.token)
                     setLoggedInUser(keycloak.idTokenParsed?.given_name)
                     await fetchUserInfo(keycloak.token)
-                    setAuthState(true) // Update auth state
+                    setAuthState(true)
+                    await sendTokenToBackend(keycloak.token)
                 } else {
-                    setAuthState(false) // Update auth state
+                    setAuthState(false)
                 }
                 setIsInitialized(true)
             })
@@ -41,6 +42,35 @@ export default function SecurityContextProvider({ children }: IWithChildren) {
                 setIsInitialized(true)
             })
     }, [])
+
+    const sendTokenToBackend = async (token?:string) => {
+        token = keycloak.token // Retrieved from Keycloak instance
+        if (!token) {
+            console.error('No token available')
+            return
+        }
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_LOCAL_BASE_URL}/api/v1/players`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token }),
+            })
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`)
+            }
+
+            const data = await response.json()
+            console.log('Response from backend:', data)
+        } catch (error) {
+            console.error('Error sending request:', error)
+        }
+    }
+
 
     const fetchUserInfo = async (token: string | undefined) => {
         if (!token) return
@@ -93,10 +123,10 @@ export default function SecurityContextProvider({ children }: IWithChildren) {
     const login = () => keycloak.login()
     const logout = () => keycloak.logout({ redirectUri: import.meta.env.VITE_REACT_APP_URL })
 
-    function checkIsAuthenticated() {
-        if (keycloak.token) return !isExpired(keycloak.token)
-        return false
-    }
+    // function checkIsAuthenticated() {
+    //     if (keycloak.token) return !isExpired(keycloak.token)
+    //     return false
+    // }
 
     if (!isInitialized) {
         return <div>Loading...</div> // Placeholder during initialization
