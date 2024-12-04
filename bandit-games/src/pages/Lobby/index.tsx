@@ -16,22 +16,64 @@ import SearchInput from '@/components/Search'
 
 
 export const Lobby: React.FC = () => {
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams,] = useSearchParams()
+    const gameId = searchParams.get('gameId')
     const gameName = searchParams.get('game')
     const navigate = useNavigate()
-
-
     const {keycloak} = useKeycloak()
-    const {disconnectWebSocket, sendLeaveLobbyRequest, sendReadyToPlayRequest} = useWebSocket(keycloak)
-    const [isConnected, setIsConnected] = useState(false)  // Track connection status
-    const [isReadyToPlay, setIsReadyToPlay] = useState(false)
+    const [lobbyPlayers, setLobbyPlayers] = useState([])
 
-    const {isAuthenticated, loggedInUser} = useContext(SecurityContext)
-    const [players, setPlayers] = useState<string[]>(['Host Player'])
-    const [messages, setMessages] = useState([
+    const {
+        connectWebSocket,
+        disconnectWebSocket,
+        sendJoinLobbyRequest,
+        sendLeaveLobbyRequest,
+        messages,
+        sendReadyToPlayRequest,
+        isWebSocketReady
+    } = useWebSocket(keycloak)
+    const [isConnected, setIsConnected] = useState(false)
+
+
+    const [chat, setChat] = useState([
         {id: 1, sender: 'John', text: 'Hey there!'},
         {id: 2, sender: 'You', text: 'Hi John, how are you?'},
     ])
+    const handleJoinLobby = () => {
+        if (gameId) {
+            sendJoinLobbyRequest(gameId)
+        } else {
+            console.error('Player ID and Game ID are required!')
+        }
+    }
+
+    useEffect(() => {
+
+        if (keycloak?.authenticated && !isConnected) {
+            connectWebSocket()
+            setIsConnected(true)
+            // handleJoinLobby()
+        }
+        if (messages.length > 0) {
+            const latestMessage = messages[messages.length - 1]
+            if (latestMessage.players) {
+                setLobbyPlayers(latestMessage.players)
+            }
+        }
+
+        return () => {
+            if (isConnected) {
+                disconnectWebSocket()
+                setIsConnected(false)
+            }
+        }
+    }, [keycloak, gameId, messages])
+
+    useEffect(() => {
+        if (isWebSocketReady) {
+            handleJoinLobby()
+        }
+    }, [isWebSocketReady])
 
     const handleLeaveLobby = () => {
         sendLeaveLobbyRequest()
@@ -68,8 +110,8 @@ export const Lobby: React.FC = () => {
                         <p>Wait for or invite players for the game to start</p>
                         <div className="mt-2">
                             <Progress color="success" aria-label="Waiting for a player"
-                                      value={(players.length / 2) * 100}/>
-                            <span className="text-sm">{players.length}/2 players</span>
+                                      value={(lobbyPlayers.length / 2) * 100}/>
+                            <span className="text-sm">{lobbyPlayers.length}/2 players</span>
                         </div>
                     </div>
 
@@ -77,37 +119,22 @@ export const Lobby: React.FC = () => {
                     <div className="bg-gray-700 p-4 rounded-md">
                         <h2 className="text-lg font-bold">Players</h2>
                         <div className="mt-2 space-y-4">
-                            {/* Host Player */}
-                            {isAuthenticated ? (
-                                <div className="flex items-center gap-4">
-                                    <User name={loggedInUser} description={`@${loggedInUser}`}
-                                          avatarSrc={faker.image.avatar()}/>
-                                    <p>(Host)</p>
-                                    <div>
+                            {lobbyPlayers.length > 0 ? (
+                                lobbyPlayers.map((player) => (
+                                    <div key={player.id} className="flex items-center gap-4 p-2 bg-gray-800 rounded-md">
                                         <img
-                                            src="/alien-monster.png"
-                                            alt="Alien Monster"
-                                            style={{
-                                                width: '50px',
-                                                height: 'auto',
-                                                animation: 'pulse 2s infinite',
-                                            }}
-                                        /></div>
-                                </div>
+                                            src={faker.image.avatar()}
+                                            alt={player.username}
+                                            className="w-12 h-12 rounded-full"
+                                        />
+                                        <div>
+                                            <p className="font-bold text-white">{player.username}</p>
+                                            <p className="text-gray-400 text-sm">Player ID: {player.id}</p>
+                                        </div>
+                                    </div>
+                                ))
                             ) : (
-                                <p>Please log in to join the lobby.</p>
-                            )}
-                            {players.slice(1).map((player, index) => (
-                                <div key={index} className="flex items-center gap-4">
-                                    <User
-                                        name={player}
-                                        description={`@${player.toLowerCase().replace(' ', '_')}`}
-                                        avatarSrc={faker.image.avatar()}
-                                    />
-                                </div>
-                            ))}
-                            {/* Skeleton while waiting for players */}
-                            {players.length < 2 && (
+                                // Skeleton Loader or Placeholder
                                 <div className="flex items-center gap-3">
                                     <Skeleton className="flex rounded-full w-12 h-12"/>
                                     <div className="w-full flex flex-col gap-2">
@@ -120,20 +147,18 @@ export const Lobby: React.FC = () => {
                         {/* Add Player Input */}
                         <div className="mt-4 flex items-center gap-4">
                             <SearchInput/>
-                            <Button type="button"
-                                    className="text-sm font-normal text-default-600 bg-default-100"
+                            <Button type="button" className="text-sm font-normal text-default-600 bg-default-100"
                             >
                                 Invite Player
                             </Button>
-                            {players.length === 2 && (
-                                <Button onClick={handleReadyToPlay}
-                                        className="text-sm font-normal text-default-600 bg-default-100">
+                            {lobbyPlayers.length === 2 && (
+                                <Button
+                                    onClick={handleReadyToPlay}
+                                    className="text-sm font-normal text-default-600 bg-default-100"
+                                >
                                     Start Game
                                 </Button>
                             )}
-                        </div>
-                        <div>
-
                         </div>
                     </div>
                 </main>
@@ -142,7 +167,7 @@ export const Lobby: React.FC = () => {
                 <aside className="w-1/4 p-4 bg-secondary-100">
                     <p className={subtitle()}>Chat</p>
                     <div className="h-64 bg-gray-800 rounded-md p-4 overflow-y-auto space-y-2">
-                        {messages.map((message) => (
+                        {chat.map((message) => (
                             <div key={message.id}
                                  className={`flex ${message.sender === 'You' ? 'justify-end' : 'justify-start'}`}>
                                 <div
@@ -155,7 +180,6 @@ export const Lobby: React.FC = () => {
                             </div>
                         ))}
                     </div>
-
                     <div className="mt-4 flex items-center">
                         <Input
                             variant="flat"
