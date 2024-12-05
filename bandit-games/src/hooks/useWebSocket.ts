@@ -6,7 +6,9 @@ const useWebSocket = (keycloakInstance) => {
     const [stompClient, setStompClient] = useState(null)
     const [messages, setMessages] = useState([])
     const [lobbyId, setLobbyId] = useState(null)
-    const { keycloak } = useKeycloak()
+    const {keycloak} = useKeycloak()
+    const [isWebSocketReady, setIsWebSocketReady] = useState(false)
+
 
     const connectWebSocket = () => {
         if (!keycloakInstance || !keycloakInstance.authenticated) {
@@ -24,6 +26,7 @@ const useWebSocket = (keycloakInstance) => {
             },
             debug: (str) => console.log(str),
             onConnect: () => {
+                setIsWebSocketReady(true)
                 console.log('WebSocket connected!')
                 client.subscribe(`/queue/user/${userId}`, (message) => {
                     const receivedMessage = JSON.parse(message.body)
@@ -115,6 +118,7 @@ const useWebSocket = (keycloakInstance) => {
         messages,
         sendLeaveLobbyRequest,
         sendReadyToPlayRequest,
+        isWebSocketReady
     }
 
 }

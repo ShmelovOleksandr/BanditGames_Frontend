@@ -10,7 +10,6 @@ import SectionComponent from '@/components/Section'
 import {subtitle, title} from '@/components/primitives.ts'
 import SearchInput from '@/components/Search'
 import {useKeycloak} from '@/hooks/useKeyCloak.ts'
-import useWebSocket from '@/hooks/useWebSocket.ts'
 import ButtonComponent from '@/components/Button'
 
 
@@ -31,11 +30,6 @@ export const Catalog: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('')
 
     const {keycloak} = useKeycloak()
-    const {
-        connectWebSocket,
-        sendJoinLobbyRequest,
-    } = useWebSocket(keycloak)
-    const [isConnected, setIsConnected] = useState(false)
 
     useEffect(() => {
         axios.get(`${apiUrl}/api/v1/games`)
@@ -56,19 +50,8 @@ export const Catalog: React.FC = () => {
         }
     }, [keycloak])
 
-    const handleJoinLobby = (gameId: string, title: string) => {
-        if (gameId) {
-            sendJoinLobbyRequest(gameId)
-            navigate(`/lobby?game=${title}`)
-        } else {
-            console.error('Game ID is required!')
-        }
-    }
-
     const handleQuickMatch = (gameId: string, title: string) => {
-        connectWebSocket()
-        setIsConnected(true)
-        handleJoinLobby(gameId, title)
+        navigate(`/lobby?game=${title}&gameId=${gameId}`)
     }
 
 
