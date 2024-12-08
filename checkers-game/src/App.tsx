@@ -1,10 +1,11 @@
 import './App.css'
+import {Button} from "@nextui-org/react";
 
 function App() {
 
     return (
         <>
-            <button className="bg-amber-500">Button</button>
+            <Button className="bg-amber-500">Button</Button>
         </>
     )
 }
