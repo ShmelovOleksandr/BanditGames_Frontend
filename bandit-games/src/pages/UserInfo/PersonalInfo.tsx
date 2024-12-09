@@ -16,7 +16,7 @@ interface UserAttributes {
 }
 
 const PersonalInfo: React.FC = () => {
-    const { userInfo, isAuthenticated, login } = useContext(SecurityContext)
+    const { userInfo, isAuthenticated, login, keycloak } = useContext(SecurityContext)
     const navigate = useNavigate()
 
     const [attributes, setAttributes] = useState<UserAttributes>({
@@ -68,53 +68,51 @@ const PersonalInfo: React.FC = () => {
 
     const handleSave = async () => {
         try {
-            // Fetch the admin token
-            const adminTokenResponse = await fetch(`${import.meta.env.VITE_KC_URL}/realms/master/protocol/openid-connect/token`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    client_id: import.meta.env.VITE_KC_ADMIN_CLIENT_ID,
-                    client_secret: import.meta.env.VITE_KC_ADMIN_CLIENT_SECRET,
-                    grant_type: 'client_credentials',
-                }),
-            })
+            // Fetch the user's access token for the Admin API
+            await keycloak.updateToken(5) // Refresh token if needed
+            const userToken = keycloak.token
 
-            if (!adminTokenResponse.ok) {
-                throw new Error(`Failed to fetch admin token: ${adminTokenResponse.statusText}`)
+            // Construct the payload to update user attributes
+            const payload = {
+                username: attributes.username,
+                email: attributes.email,
+                firstName: attributes.firstName,
+                lastName: attributes.lastName,
+                attributes: {
+                    age: attributes.age ? [String(attributes.age)] : undefined,
+                    gender: attributes.gender ? [attributes.gender] : undefined,
+                    country: attributes.country ? [attributes.country] : undefined,
+                    city: attributes.city ? [attributes.city] : undefined,
+                    address: attributes.address ? [attributes.address] : undefined,
+                    postalCode: attributes.postalCode ? [attributes.postalCode] : undefined,
+                },
             }
 
-            const adminTokenData = await adminTokenResponse.json()
-            const adminToken = adminTokenData.access_token
+            const userId = userInfo?.sub
+            if (!userId) {
+                throw new Error('User ID not found.')
+            }
 
-            // Update user attributes in Keycloak
-            const userId = userInfo?.sub // Assuming 'sub' contains the user's ID
-            const response = await fetch(`${import.meta.env.VITE_KC_URL}/admin/realms/${import.meta.env.VITE_KC_REALM}/users/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${adminToken}`,
-                },
-                body: JSON.stringify({
-                    username: attributes.username,
-                    email: attributes.email,
-                    firstName: attributes.firstName,
-                    lastName: attributes.lastName,
-                    attributes: {
-                        age: [String(attributes.age)], // Custom attributes must be arrays
-                        gender: [attributes.gender],
-                        country: [attributes.country],
-                        city: [attributes.city],
+            // Call the Keycloak Admin API to update the user
+            const response = await fetch(
+                `${import.meta.env.VITE_KC_URL}/admin/realms/${keycloak.realm}/users/${userId}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${userToken}`,
                     },
-                }),
-            })
+                    body: JSON.stringify(payload),
+                }
+            )
 
             if (!response.ok) {
-                throw new Error(`Failed to update user in Keycloak: ${response.statusText}`)
+                throw new Error(`Failed to update user: ${response.statusText}`)
             }
 
             alert('Your changes have been saved.')
         } catch (error) {
-            console.error('Error saving user data to Keycloak:', error)
+            console.error('Error saving user data:', error)
             alert('Failed to save changes.')
         }
     }
