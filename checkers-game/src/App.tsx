@@ -1,12 +1,12 @@
 import './App.css'
-import {Button} from "@nextui-org/react";
+import GameBoard from "@/components/GameBoard/index.tsx";
 
 function App() {
 
     return (
-        <>
-            <Button className="bg-amber-500">Button</Button>
-        </>
+        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+            <GameBoard/>
+        </div>
     )
 }
 
