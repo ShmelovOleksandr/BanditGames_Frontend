@@ -9,6 +9,11 @@ export const title = tv({
                 'text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-purple-400',
 
         },
+        postion: {
+            center: 'text-center',
+            left: 'text-left',
+            right: 'text-right',
+        },
         size: {
             sm: 'text-1xl lg:text-2xl',
             md: 'text-[2.3rem] lg:text-5xl leading-9',
