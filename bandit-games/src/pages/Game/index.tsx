@@ -7,6 +7,7 @@ import {title} from '@/components/primitives'
 import SectionComponent from '@/components/Section'
 import BlurredCard from '@/components/BlurredCard'
 import ReviewsSection from '@/components/Reviews'
+import {faker} from '@faker-js/faker'
 
 const apiUrl = import.meta.env.VITE_LOCAL_BASE_URL
 
@@ -30,7 +31,14 @@ const GameDetails: React.FC = () => {
         const fetchGameDetails = async (id: string) => {
             try {
                 const response = await axios.get(`${apiUrl}/api/v1/games/${id}`)
-                setState({game: response.data, error: null})
+                const gameData = response.data
+
+                const gameWithImage = {
+                    ...gameData,
+                    imageUrl: faker.image.url({width: 640, height: 480, category: 'game'}), // Correct API
+                }
+
+                setState({game: gameWithImage, error: null})
             } catch (err) {
                 console.error('Error fetching game details:', err)
                 setState({game: null, error: 'Failed to load game details.'})
@@ -63,7 +71,7 @@ const GameDetails: React.FC = () => {
             <SectionComponent>
                 <div
                     className="relative flex items-center justify-center h-dvh bg-cover bg-center"
-                    style={{backgroundImage: 'url(\'/splash-bg.jpg\')'}}
+                    style={{backgroundImage: `url('${game.imageUrl}')`}}
                 >
                     <div className="absolute bottom-14 left-12 flex flex-col items-start space-y-4">
                         <p
