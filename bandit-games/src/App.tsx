@@ -7,7 +7,7 @@ import SecurityContextProvider from './context/SecurityContextProvider'
 import GameDetails from '@/pages/Game'
 import Lobby from '@/pages/Lobby'
 import {RouteGuard} from './components/RouteGuard'
-import MyAccount from '@/pages/account'
+import MyAccount from '@/pages/Account'
 import PersonalInfo from '@/pages/UserInfo/PersonalInfo.tsx'
 import ChangePassword from '@/pages/ChangePassword/ChangePassword.tsx'
 
@@ -27,7 +27,7 @@ function App() {
                         path="/my-account"
                         element={
                             <RouteGuard>
-                                <MyAccount />
+                                <MyAccount/>
                             </RouteGuard>
                         }
                     />
@@ -35,7 +35,7 @@ function App() {
                         path="/personal-info"
                         element={
                             <RouteGuard>
-                                <PersonalInfo />
+                                <PersonalInfo/>
                             </RouteGuard>
                         }
                     />
@@ -43,7 +43,7 @@ function App() {
                         path="/change-password"
                         element={
                             <RouteGuard>
-                                <ChangePassword />
+                                <ChangePassword/>
                             </RouteGuard>
                         }
                     />
