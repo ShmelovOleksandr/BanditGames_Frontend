@@ -1,14 +1,16 @@
 import './App.css'
-import {Button} from "@nextui-org/react";
+import GameBoard from "@/components/GameBoard/index.tsx";
 import SecurityContextProvider from "@/context/SecurityContextProvider.tsx";
 import {RouteGuard} from "@/context/RouteGuard.tsx";
+
 
 function App() {
 
     return (
+
         <SecurityContextProvider>
             <RouteGuard>
-                <Button className="bg-amber-500">Button</Button>
+                <GameBoard/>
             </RouteGuard>
         </SecurityContextProvider>
     )
