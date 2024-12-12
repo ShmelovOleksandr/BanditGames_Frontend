@@ -1,7 +1,7 @@
 import {ReactNode, useEffect, useState} from 'react'
-import keycloak from './keycloakInstance'
-import SecurityContext from './SecurityContext' // You define your context here
-import {addAccessTokenToAuthHeader, removeAccessTokenFromAuthHeader} from '../services/auth'
+import keycloak from '@/context/keycloakInstance.ts'
+import SecurityContext from '@/context/SecurityContext.ts'
+import {addAccessTokenToAuthHeader, removeAccessTokenFromAuthHeader} from '@/services/auth.ts'
 
 interface IWithChildren {
     children: ReactNode;
@@ -20,7 +20,7 @@ export default function SecurityContextProvider({children}: IWithChildren) {
                     addAccessTokenToAuthHeader(keycloak.token)
                     setLoggedInUser(keycloak.idTokenParsed?.given_name)
                     await fetchUserInfo(keycloak.token)
-                    await sendTokenToBackend(keycloak.token)
+                    // Removed sendTokenToBackend call since it's no longer needed
                     setAuthState(true)
                 } else {
                     setAuthState(false)
@@ -49,35 +49,6 @@ export default function SecurityContextProvider({children}: IWithChildren) {
             }
         } catch (error) {
             console.error('Error fetching user info:', error)
-        }
-    }
-
-    const sendTokenToBackend = async (token?: string) => {
-        token = keycloak.token
-        if (!token) return
-
-        const isRegistered = localStorage.getItem('isRegistered')
-        if (isRegistered) return
-
-        try {
-            const response = await fetch(`${import.meta.env.VITE_LOCAL_BASE_URL}/api/v1/players`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({token}),
-            })
-
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status}`)
-            }
-
-            const data = await response.json()
-            console.log('Response from backend:', data)
-            localStorage.setItem('isRegistered', 'true')
-        } catch (error) {
-            console.error('Error sending request:', error)
         }
     }
 

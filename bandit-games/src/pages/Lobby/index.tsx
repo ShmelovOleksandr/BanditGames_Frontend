@@ -1,10 +1,8 @@
 import {Navigation} from '@/components/Navbar'
 import SectionComponent from '@/components/Section'
 import ButtonComponent from '@/components/Button'
-import {useContext, useEffect, useRef, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {subtitle, title} from '@/components/primitives.ts'
-import User from '@/components/User'
-import SecurityContext from '@/context/SecurityContext'
 import {faker} from '@faker-js/faker'
 import {Progress, Skeleton, Tooltip} from '@nextui-org/react'
 import {Button} from '@nextui-org/button'
@@ -16,7 +14,7 @@ import SearchInput from '@/components/Search'
 
 
 export const Lobby: React.FC = () => {
-    const [searchParams,] = useSearchParams()
+    const [searchParams] = useSearchParams()
     const gameId = searchParams.get('gameId')
     const gameName = searchParams.get('game')
     const navigate = useNavigate()
@@ -34,7 +32,6 @@ export const Lobby: React.FC = () => {
     } = useWebSocket(keycloak)
     const [isConnected, setIsConnected] = useState(false)
 
-
     const [chat, setChat] = useState([
         {id: 1, sender: 'John', text: 'Hey there!'},
         {id: 2, sender: 'You', text: 'Hi John, how are you?'},
@@ -48,11 +45,9 @@ export const Lobby: React.FC = () => {
     }
 
     useEffect(() => {
-
         if (keycloak?.authenticated && !isConnected) {
             connectWebSocket()
             setIsConnected(true)
-            // handleJoinLobby()
         }
         if (messages.length > 0) {
             const latestMessage = messages[messages.length - 1]
@@ -60,14 +55,7 @@ export const Lobby: React.FC = () => {
                 setLobbyPlayers(latestMessage.players)
             }
         }
-
-        return () => {
-            if (isConnected) {
-                disconnectWebSocket()
-                setIsConnected(false)
-            }
-        }
-    }, [keycloak, gameId, messages])
+    }, [keycloak, gameId, messages, lobbyPlayers])
 
     useEffect(() => {
         if (isWebSocketReady) {
@@ -79,12 +67,16 @@ export const Lobby: React.FC = () => {
         sendLeaveLobbyRequest()
         disconnectWebSocket()
         setIsConnected(false)
+        setLobbyPlayers([])
         navigate('/game-library')
     }
-
+    const handleRedirect = () => {
+        const token = keycloak.token
+        window.location.href = `http://localhost:5174?token=${token}`
+    }
     const handleReadyToPlay = () => {
         sendReadyToPlayRequest()
-        // navigate('/game')
+        handleRedirect()
     }
 
 
