@@ -70,10 +70,13 @@ export const Lobby: React.FC = () => {
         setLobbyPlayers([])
         navigate('/game-library')
     }
-
+    const handleRedirect = () => {
+        const token = keycloak.token
+        window.location.href = `http://localhost:5174?token=${token}`
+    }
     const handleReadyToPlay = () => {
         sendReadyToPlayRequest()
-        // navigate('/game')
+        handleRedirect()
     }
 
 
