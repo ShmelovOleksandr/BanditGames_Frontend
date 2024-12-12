@@ -1,14 +1,15 @@
-interface PieceProps {
-    color: "black" | "white";
-}
+const Piece = ({color, isSelected, onClick}) => {
+    const baseClasses = "w-8 h-8 rounded-full cursor-pointer";
 
-const Piece = ({color}: PieceProps) => {
+    const highlightClasses = isSelected ? "ring ring-yellow-500 ring-offset-2 ring-offset-black" : "";
+
+    const pieceColorClass = color === "black" ? "bg-black" : "bg-white";
+
     return (
         <div
-            className={`rounded-full w-8 h-8 ${
-                color === "black" ? "bg-black" : "bg-white"
-            } border-2 border-gray-300`}
-        />
+            className={`${baseClasses} ${pieceColorClass} ${highlightClasses}`}
+            onClick={onClick}>
+        </div>
     );
 };
 
