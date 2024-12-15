@@ -6,6 +6,8 @@ import {useKeycloak} from "@/hooks/useKeyCloak.ts";
 import Square from "@/components/Square";
 import {GameState, PieceData} from "@/model/GameState.ts";
 import useGameUUID from "@/hooks/useGameUUID.ts";
+import {Move} from "@/model/Move.ts";
+import {Position} from "@/model/Position.ts";
 
 interface SelectedPiece {
     valueX: number;
@@ -19,14 +21,17 @@ const GameBoard = () => {
     const {
         connectWebSocket,
         sendGetGameStateRequest,
+        sendGetPiecePossibleMoves,
         messages,
         isWebSocketReady
     } = useWebSocket();
     const [isConnected, setIsConnected] = useState(false)
 
+    const [highlightedSquares, setHighlightedSquares] = useState<Position[]>([])
     const [pieces, setPieces] = useState<PieceData[]>([]);
     const [playerColor, setPlayerColor] = useState<string | null>(null);
     const gameUUID = useGameUUID();
+    const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
 
 
     useEffect(() => {
@@ -45,26 +50,46 @@ const GameBoard = () => {
 
     useEffect(() => {
         const latestMessage = messages[messages.length - 1];
-        if (latestMessage && latestMessage.pieces && latestMessage.players) {
+        if (latestMessage && ('pieces' in latestMessage)) {
             const gameState = latestMessage as GameState;
             setPieces(gameState.pieces);
+            setCurrentPlayerId(gameState.currentPlayer)
 
             const player = gameState.players.find((p) => p.playerId === userId);
             if (player) {
                 setPlayerColor(player.color);
             }
         }
+
+        if (latestMessage && ('moves' in latestMessage)) {
+            const moves = latestMessage.moves as Move[];
+            const finalPositions = moves.map((move) => move.finalPosition);
+            console.log(`Current player ${currentPlayerId} player selected ${userId}`)
+            setHighlightedSquares(finalPositions);
+
+        }
     }, [messages, userId]);
 
 
-    const handlePieceClick = (x:number, y:number, valueY: number, valueX: number, color: string) => {
+    const handlePieceClick = (valueY: number, valueX: number, color: string) => {
         if (selectedPiece && selectedPiece.valueY === valueY && selectedPiece.valueX === valueX) {
             setSelectedPiece(null);
+            setHighlightedSquares([])
         } else {
             setSelectedPiece({valueY, valueX, color});
-            console.log(`Selected pieces valueY,valueX (${valueY},${valueX}) and piece x,y (${x}, ${y})`)
+            if (gameUUID && (currentPlayerId === userId)) {
+                sendGetPiecePossibleMoves(gameUUID, valueX, valueY);
+            }
+
+            console.log(`Selected pieces valueX, valueY (${valueX},${valueY})`)
         }
     };
+
+    const handleSquareClick = (valueX: number, valueY: number) => {
+        console.log(`Clicked square ${valueX} ${valueY}`)
+    }
+
+
     const yRange = playerColor === "WHITE" ? [...Array(10).keys()] : [...Array(10).keys()].reverse();
     const xRange = playerColor === "BLACK" ? [...Array(10).keys()] : [...Array(10).keys()].reverse();
 
@@ -87,8 +112,17 @@ const GameBoard = () => {
                                     selectedPiece.valueX === valueX
                                 );
 
+                                const isHighlighted = highlightedSquares.some(
+                                    (square) => square.x === valueX && square.y === valueY
+                                );
+
                                 return (
-                                    <Square key={`${valueY}-${valueX}`} isDark={isDark}>
+                                    <Square
+                                        key={`${valueY}-${valueX}`}
+                                        isDark={isDark}
+                                        isHighlighted={isHighlighted}
+                                        onClick={isHighlighted ? () => handleSquareClick(valueX, valueY) : undefined}
+                                    >
                                         {piece && (
                                             <Piece
                                                 key={`${piece.x}-${piece.y}`}
@@ -96,7 +130,7 @@ const GameBoard = () => {
                                                 isSelected={isSelected}
                                                 onClick={
                                                     isOwnedByCurrentUser
-                                                        ? () => handlePieceClick(piece.x, piece.y, valueY, valueX, piece.pieceColor)
+                                                        ? () => handlePieceClick(valueY, valueX, piece.pieceColor)
                                                         : undefined
                                                 }
                                             />
