@@ -1,6 +1,8 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Piece from "@/components/Piece";
 import BoardLayout from "@/layouts/boardLayout.tsx";
+import useWebSocket from "@/hooks/useWebSocket.ts";
+import {useKeycloak} from "@/hooks/useKeyCloak.ts";
 
 interface SelectedPiece {
     row: number;
@@ -9,9 +11,22 @@ interface SelectedPiece {
 }
 
 const GameBoard = () => {
-    const [selectedPiece, setSelectedPiece] = useState<SelectedPiece>(null);
+    const [selectedPiece, setSelectedPiece] = useState<SelectedPiece | null>(null);
+    const {isAuthenticated} = useKeycloak();
+    const {
+        connectWebSocket,
+    } = useWebSocket();
+    const [isConnected, setIsConnected] = useState(false)
 
-    const handlePieceClick = (row, col, color) => {
+    useEffect(() => {
+     if (isAuthenticated() && !isConnected) {
+        connectWebSocket();
+        setIsConnected(true);
+     }
+    });
+
+
+    const handlePieceClick = (row: number, col: number, color: string) => {
         if (selectedPiece && selectedPiece.row === row && selectedPiece.col === col) {
             setSelectedPiece(null);
         } else {
