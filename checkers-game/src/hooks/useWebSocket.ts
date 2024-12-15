@@ -50,9 +50,23 @@ const useWebSocket = () => {
         }
     }
 
+    const sendGetGameStateRequest = (gameId: string) => {
+        if (!stompClient || !stompClient.connected) {
+            console.log('WebSocket is not connected!');
+            return;
+        }
+        const playerId = userId;
+        const payload = { gameId, playerId };
+        stompClient.publish({
+            destination: '/app/get-state',
+            body: JSON.stringify(payload),
+        });
+    }
+
     return {
         connectWebSocket,
         disconnectWebSocket,
+        sendGetGameStateRequest,
         messages,
         isWebSocketReady
     }
