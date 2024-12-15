@@ -11,7 +11,7 @@ export function RouteGuard({children}: RouteGuardProps) {
     const [isCheckingAuth, setIsCheckingAuth] = useState(true) // To handle async login flow
 
     useEffect(() => {
-        if (!isAuthenticated) {
+        if (!isAuthenticated()) {
             login() // Trigger Keycloak login
         } else {
             setIsCheckingAuth(false) // Authentication is confirmed
@@ -22,5 +22,5 @@ export function RouteGuard({children}: RouteGuardProps) {
         return <div>Loading...</div> // Show a loading indicator while checking authentication
     }
 
-    return isAuthenticated ? <>{children}</> : <Navigate to="/" replace/> // Redirect to home if not authenticated
+    return isAuthenticated() ? <>{children}</> : <Navigate to="/" replace/> // Redirect to home if not authenticated
 }

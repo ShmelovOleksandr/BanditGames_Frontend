@@ -10,7 +10,7 @@ interface IWithChildren {
 export default function SecurityContextProvider({children}: IWithChildren) {
     const [authState, setAuthState] = useState(keycloak.authenticated || false)
     const [loggedInUser, setLoggedInUser] = useState<string | undefined>(undefined)
-    const [userInfo, setUserInfo] = useState<any>(null)
+    const [userId, setUserId] = useState<string | undefined>(undefined)
     const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
@@ -19,8 +19,7 @@ export default function SecurityContextProvider({children}: IWithChildren) {
                 if (authenticated) {
                     addAccessTokenToAuthHeader(keycloak.token)
                     setLoggedInUser(keycloak.idTokenParsed?.given_name)
-                    await fetchUserInfo(keycloak.token)
-                    // Removed sendTokenToBackend call since it's no longer needed
+                    setUserId(keycloak.tokenParsed?.sub)
                     setAuthState(true)
                 } else {
                     setAuthState(false)
@@ -33,41 +32,22 @@ export default function SecurityContextProvider({children}: IWithChildren) {
             })
     }, [])
 
-    const fetchUserInfo = async (token?: string) => {
-        if (!token) return
-        const userInfoEndpoint = `${import.meta.env.VITE_KC_URL}/realms/${import.meta.env.VITE_KC_REALM}/protocol/openid-connect/userinfo`
-
-        try {
-            const response = await fetch(userInfoEndpoint, {
-                headers: {Authorization: `Bearer ${token}`},
-            })
-            if (response.ok) {
-                const data = await response.json()
-                setUserInfo(data)
-            } else {
-                console.error('Failed to fetch user info')
-            }
-        } catch (error) {
-            console.error('Error fetching user info:', error)
-        }
-    }
-
     keycloak.onAuthSuccess = async () => {
         addAccessTokenToAuthHeader(keycloak.token)
         setLoggedInUser(keycloak.idTokenParsed?.given_name)
-        await fetchUserInfo(keycloak.token)
+        setUserId(keycloak.tokenParsed?.sub)
     }
 
     keycloak.onAuthLogout = () => {
         removeAccessTokenFromAuthHeader()
-        setUserInfo(null)
+        setUserId(undefined)
+        setLoggedInUser(undefined)
         setAuthState(false)
     }
 
     keycloak.onTokenExpired = () => {
         keycloak.updateToken(-1).then(async () => {
             addAccessTokenToAuthHeader(keycloak.token)
-            await fetchUserInfo(keycloak.token)
         }).catch(() => {
             console.log('Token refresh failed. Logging out.')
             keycloak.logout()
@@ -80,7 +60,7 @@ export default function SecurityContextProvider({children}: IWithChildren) {
     if (!isInitialized) return <div>Loading...</div>
 
     return (
-        <SecurityContext.Provider value={{isAuthenticated: authState, loggedInUser, userInfo, login, logout, keycloak}}>
+        <SecurityContext.Provider value={{isAuthenticated: () => authState, loggedInUser, login, logout, keycloak, userId}}>
             {children}
         </SecurityContext.Provider>
     )
