@@ -24,12 +24,12 @@ const useWebSocket = () => {
             },
             debug: (str) => console.log(str),
             onConnect: () => {
-                setIsWebSocketReady(true)
-                console.log('WebSocket connected!')
                 client.subscribe(`/queue/user/${playerId}`, (message) => {
                     const receivedMessage = JSON.parse(message.body)
                     setMessages(prev => [...prev, receivedMessage])
-                })
+                });
+                setIsWebSocketReady(true)
+                console.log('WebSocket connected!')
             },
             onStompError: (frame) => {
                 console.error('Broker reported error:', frame.headers['message'])
@@ -49,8 +49,6 @@ const useWebSocket = () => {
             console.log('WebSocket disconnected!')
         }
     }
-
-
 
     return {
         connectWebSocket,
