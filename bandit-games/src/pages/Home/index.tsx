@@ -1,7 +1,7 @@
 import {subtitle, title} from '@/components/primitives'
 import DefaultLayout from '@/layouts/default'
 import {siteConfig} from '@/config/site.ts'
-import ReusableCard from '@/components/Card'
+import HomeCard from '@/components/Card'
 import User from '@/components/User'
 import {generateFakeUsers} from '@/components/fakeUsersGenerator.tsx'
 import SectionComponent from '@/components/Section/index.tsx'
@@ -54,12 +54,12 @@ export const Home: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col items-center gap-4">
-                    <ReusableCard
+                    <HomeCard
                         title="Smart Choices"
                         description="Get suggestions based on your gameplay history and preferences."
                         imageSrc="https://nextui.org/images/hero-card-complete.jpeg"
                     />
-                    <ReusableCard
+                    <HomeCard
                         title="Play More"
                         description="Expand your gaming experience with games that match your interests."
                         imageSrc="https://nextui.org/images/card-example-1.jpeg"

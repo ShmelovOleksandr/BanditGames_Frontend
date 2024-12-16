@@ -3,7 +3,7 @@ import {useEffect, useState} from 'react'
 import NotFound from '../Error'
 import DefaultLayout from '@/layouts/default.tsx'
 import {faker} from '@faker-js/faker'
-import ReusableCard from '@/components/Card'
+import HomeCard from '@/components/Card'
 import {Link, useNavigate} from 'react-router-dom'
 import {motion} from 'framer-motion'
 import SectionComponent from '@/components/Section'
@@ -85,7 +85,7 @@ export const Catalog: React.FC = () => {
                         <li key={game.gameId} className="flex flex-col items-start gap-4">
                             <motion.div whileHover={{scale: 1.1}}>
                                 <Link to={`/game-library/game?gameId=${game.gameId}`}>
-                                    <ReusableCard
+                                    <HomeCard
                                         title={game.title}
                                         description={game.description}
                                         imageSrc={game.imageSrc}
