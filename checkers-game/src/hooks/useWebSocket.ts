@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import {Client} from '@stomp/stompjs'
 import {useKeycloak} from '@/hooks/useKeyCloak.ts'
+import {Move} from "@/model/Move.ts";
 
 const useWebSocket = () => {
     const [stompClient, setStompClient] = useState<Client | null>(null);
@@ -75,11 +76,31 @@ const useWebSocket = () => {
         });
     }
 
+    const sendMovePieceRequest = (move: Move, gameId: string) => {
+        if (!stompClient || !stompClient.connected) {
+            console.log('WebSocket is not connected!');
+            return;
+        }
+        const playerId = userId;
+
+        const payload = {
+            gameId,
+            playerId,
+            move
+        }
+        stompClient.publish({
+            destination: '/app/make-move',
+            body: JSON.stringify(payload),
+        });
+
+    }
+
     return {
         connectWebSocket,
         disconnectWebSocket,
         sendGetGameStateRequest,
         sendGetPiecePossibleMoves,
+        sendMovePieceRequest,
         messages,
         isWebSocketReady
     }

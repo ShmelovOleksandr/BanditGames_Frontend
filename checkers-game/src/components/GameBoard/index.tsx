@@ -22,12 +22,14 @@ const GameBoard = () => {
         connectWebSocket,
         sendGetGameStateRequest,
         sendGetPiecePossibleMoves,
+        sendMovePieceRequest,
         messages,
         isWebSocketReady
     } = useWebSocket();
     const [isConnected, setIsConnected] = useState(false)
 
     const [highlightedSquares, setHighlightedSquares] = useState<Position[]>([])
+    const [possibleMoves, setPossibleMoves] = useState<Move[]>([])
     const [pieces, setPieces] = useState<PieceData[]>([]);
     const [playerColor, setPlayerColor] = useState<string | null>(null);
     const gameUUID = useGameUUID();
@@ -65,6 +67,7 @@ const GameBoard = () => {
             const moves = latestMessage.moves as Move[];
             const finalPositions = moves.map((move) => move.finalPosition);
             console.log(`Current player ${currentPlayerId} player selected ${userId}`)
+            setPossibleMoves(moves);
             setHighlightedSquares(finalPositions);
 
         }
@@ -75,6 +78,7 @@ const GameBoard = () => {
         if (selectedPiece && selectedPiece.valueY === valueY && selectedPiece.valueX === valueX) {
             setSelectedPiece(null);
             setHighlightedSquares([])
+            setPossibleMoves([]);
         } else {
             setSelectedPiece({valueY, valueX, color});
             if (gameUUID && (currentPlayerId === userId)) {
@@ -87,6 +91,15 @@ const GameBoard = () => {
 
     const handleSquareClick = (valueX: number, valueY: number) => {
         console.log(`Clicked square ${valueX} ${valueY}`)
+        const move = possibleMoves.find(
+            (move) => move.finalPosition.x === valueX && move.finalPosition.y === valueY
+        );
+        if (move && gameUUID) {
+            sendMovePieceRequest(move, gameUUID)
+            setSelectedPiece(null);
+            setHighlightedSquares([])
+            setPossibleMoves([])
+        }
     }
 
 
