@@ -1,13 +1,9 @@
 import {useEffect, useState} from 'react'
 import axios, {AxiosRequestConfig} from 'axios'
 
-interface FetchResult<T> {
-    data: T | null;
-    error: string | null;
-    loading: boolean;
-}
+const apiUrl = import.meta.env.VITE_LOCAL_BASE_URL
 
-export function useFetch<T>(url: string, config?: AxiosRequestConfig): FetchResult<T> {
+export function useFetch<T>(endpoint: string, config?: AxiosRequestConfig) {
     const [data, setData] = useState<T | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
@@ -17,7 +13,7 @@ export function useFetch<T>(url: string, config?: AxiosRequestConfig): FetchResu
 
         setLoading(true)
         axios
-            .get(url, config)
+            .get(`${apiUrl}${endpoint}`, config)
             .then((response) => {
                 if (isMounted) {
                     setData(response.data)
@@ -26,9 +22,8 @@ export function useFetch<T>(url: string, config?: AxiosRequestConfig): FetchResu
             })
             .catch((err) => {
                 if (isMounted) {
-                    console.error('Error fetching data:', err)
                     setError('Failed to fetch data. Please try again later.')
-                    setData(null)
+                    console.error(err)
                 }
             })
             .finally(() => {
@@ -38,7 +33,7 @@ export function useFetch<T>(url: string, config?: AxiosRequestConfig): FetchResu
         return () => {
             isMounted = false
         }
-    }, [url, JSON.stringify(config)])
+    }, [endpoint, JSON.stringify(config)])
 
     return {data, error, loading}
 }
