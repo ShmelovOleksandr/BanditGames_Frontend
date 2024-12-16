@@ -50,9 +50,36 @@ const useWebSocket = () => {
         }
     }
 
+    const sendGetGameStateRequest = (gameId: string) => {
+        if (!stompClient || !stompClient.connected) {
+            console.log('WebSocket is not connected!');
+            return;
+        }
+        const playerId = userId;
+        const payload = { gameId, playerId };
+        stompClient.publish({
+            destination: '/app/get-state',
+            body: JSON.stringify(payload),
+        });
+    }
+
+    const sendGetPiecePossibleMoves = (gameId: string, x: number, y: number) => {
+        if (!stompClient || !stompClient.connected) {
+            console.log('WebSocket is not connected!');
+            return;
+        }
+        const payload = {gameId, x, y};
+        stompClient.publish({
+            destination: '/app/get-moves',
+            body: JSON.stringify(payload),
+        });
+    }
+
     return {
         connectWebSocket,
         disconnectWebSocket,
+        sendGetGameStateRequest,
+        sendGetPiecePossibleMoves,
         messages,
         isWebSocketReady
     }

@@ -1,4 +1,13 @@
-const Piece = ({color, isSelected, onClick}) => {
+import React from "react";
+
+
+interface PieceProps {
+    color: string;
+    isSelected: boolean;
+    onClick?: () => void;
+}
+
+const Piece: React.FC<PieceProps> = ({color, isSelected, onClick}) => {
     const baseClasses = "w-8 h-8 rounded-full cursor-pointer";
 
     const highlightClasses = isSelected ? "ring ring-yellow-500 ring-offset-2 ring-offset-black" : "";

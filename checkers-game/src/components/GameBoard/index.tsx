@@ -3,70 +3,139 @@ import Piece from "@/components/Piece";
 import BoardLayout from "@/layouts/boardLayout.tsx";
 import useWebSocket from "@/hooks/useWebSocket.ts";
 import {useKeycloak} from "@/hooks/useKeyCloak.ts";
+import Square from "@/components/Square";
+import {GameState, PieceData} from "@/model/GameState.ts";
+import useGameUUID from "@/hooks/useGameUUID.ts";
+import {Move} from "@/model/Move.ts";
+import {Position} from "@/model/Position.ts";
 
 interface SelectedPiece {
-    row: number;
-    col: number;
+    valueX: number;
+    valueY: number;
     color: string;
 }
 
 const GameBoard = () => {
     const [selectedPiece, setSelectedPiece] = useState<SelectedPiece | null>(null);
-    const {isAuthenticated} = useKeycloak();
+    const {isAuthenticated, userId} = useKeycloak();
     const {
         connectWebSocket,
+        sendGetGameStateRequest,
+        sendGetPiecePossibleMoves,
+        messages,
+        isWebSocketReady
     } = useWebSocket();
     const [isConnected, setIsConnected] = useState(false)
+
+    const [highlightedSquares, setHighlightedSquares] = useState<Position[]>([])
+    const [pieces, setPieces] = useState<PieceData[]>([]);
+    const [playerColor, setPlayerColor] = useState<string | null>(null);
+    const gameUUID = useGameUUID();
+    const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
+
 
     useEffect(() => {
      if (isAuthenticated() && !isConnected) {
         connectWebSocket();
         setIsConnected(true);
      }
-    });
+    }, [isAuthenticated, isConnected, connectWebSocket]);
+
+    useEffect(() => {
+        if (isWebSocketReady && gameUUID) {
+            sendGetGameStateRequest(gameUUID);
+        }
+    }, [isWebSocketReady])
 
 
-    const handlePieceClick = (row: number, col: number, color: string) => {
-        if (selectedPiece && selectedPiece.row === row && selectedPiece.col === col) {
+    useEffect(() => {
+        const latestMessage = messages[messages.length - 1];
+        if (latestMessage && ('pieces' in latestMessage)) {
+            const gameState = latestMessage as GameState;
+            setPieces(gameState.pieces);
+            setCurrentPlayerId(gameState.currentPlayer)
+
+            const player = gameState.players.find((p) => p.playerId === userId);
+            if (player) {
+                setPlayerColor(player.color);
+            }
+        }
+
+        if (latestMessage && ('moves' in latestMessage)) {
+            const moves = latestMessage.moves as Move[];
+            const finalPositions = moves.map((move) => move.finalPosition);
+            console.log(`Current player ${currentPlayerId} player selected ${userId}`)
+            setHighlightedSquares(finalPositions);
+
+        }
+    }, [messages, userId]);
+
+
+    const handlePieceClick = (valueY: number, valueX: number, color: string) => {
+        if (selectedPiece && selectedPiece.valueY === valueY && selectedPiece.valueX === valueX) {
             setSelectedPiece(null);
+            setHighlightedSquares([])
         } else {
-            setSelectedPiece({row, col, color});
+            setSelectedPiece({valueY, valueX, color});
+            if (gameUUID && (currentPlayerId === userId)) {
+                sendGetPiecePossibleMoves(gameUUID, valueX, valueY);
+            }
+
+            console.log(`Selected pieces valueX, valueY (${valueX},${valueY})`)
         }
     };
+
+    const handleSquareClick = (valueX: number, valueY: number) => {
+        console.log(`Clicked square ${valueX} ${valueY}`)
+    }
+
+
+    const yRange = playerColor === "WHITE" ? [...Array(10).keys()] : [...Array(10).keys()].reverse();
+    const xRange = playerColor === "BLACK" ? [...Array(10).keys()] : [...Array(10).keys()].reverse();
+
 
     return (
         <BoardLayout>
             <div className="p-4 bg-black rounded-lg flex justify-center items-center w-full h-full">
                 <div className="w-full max-w-screen-md aspect-square relative">
                     <div className="grid grid-cols-10 grid-rows-10 w-full h-full">
-                        {Array.from({length: 10}, (_, row) =>
-                            Array.from({length: 10}, (_, col) => {
-                                const isDark = (row + col) % 2 === 1;
-                                let pieceColor = null;
+                        {yRange.map((valueY) =>
+                            xRange.map((valueX) => {
+                                const isDark = (valueY + valueX) % 2 === 1;
 
-                                if (isDark && row < 4) pieceColor = "black";
-                                if (isDark && row > 5) pieceColor = "white";
+                                const piece = pieces.find((p) => p.x === valueX && p.y === valueY);
+                                const isOwnedByCurrentUser = piece?.pieceColor === playerColor;
 
-                                const isSelected =
+                                const isSelected = !!(
                                     selectedPiece &&
-                                    selectedPiece.row === row &&
-                                    selectedPiece.col === col;
+                                    selectedPiece.valueY === valueY &&
+                                    selectedPiece.valueX === valueX
+                                );
+
+                                const isHighlighted = highlightedSquares.some(
+                                    (square) => square.x === valueX && square.y === valueY
+                                );
 
                                 return (
-                                    <div
-                                        key={`${row}-${col}`}
-                                        className={`flex justify-center items-center ${
-                                            isDark ? "bg-gray-800" : "bg-gray-200"
-                                        }`}
+                                    <Square
+                                        key={`${valueY}-${valueX}`}
+                                        isDark={isDark}
+                                        isHighlighted={isHighlighted}
+                                        onClick={isHighlighted ? () => handleSquareClick(valueX, valueY) : undefined}
                                     >
-                                        {pieceColor && (
+                                        {piece && (
                                             <Piece
-                                                color={pieceColor}
+                                                key={`${piece.x}-${piece.y}`}
+                                                color={piece.pieceColor.toLowerCase()}
                                                 isSelected={isSelected}
-                                                onClick={() => handlePieceClick(row, col, pieceColor)}
+                                                onClick={
+                                                    isOwnedByCurrentUser
+                                                        ? () => handlePieceClick(valueY, valueX, piece.pieceColor)
+                                                        : undefined
+                                                }
                                             />
                                         )}
-                                    </div>
+                                    </Square>
                                 );
                             })
                         )}
