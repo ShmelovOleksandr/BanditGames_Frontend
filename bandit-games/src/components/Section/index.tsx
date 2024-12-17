@@ -1,9 +1,14 @@
 import {motion, useAnimation} from 'framer-motion'
 import {useInView} from 'react-intersection-observer'
-import {useEffect} from 'react'
-import * as React from 'react'
+import {useEffect, ReactNode, CSSProperties} from 'react'
 
-const SectionComponent: React.FC = ({children, className, style}) => {
+interface SectionComponentProps {
+    children: ReactNode;
+    className?: string;
+    style?: CSSProperties;
+}
+
+function SectionComponent({children, className, style}: SectionComponentProps) {
     const controls = useAnimation()
     const [ref, inView] = useInView({threshold: 0.2})
 
@@ -33,5 +38,5 @@ const SectionComponent: React.FC = ({children, className, style}) => {
         </motion.div>
     )
 }
-export default SectionComponent
 
+export default SectionComponent

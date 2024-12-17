@@ -1,29 +1,43 @@
-import {ReactNode} from 'react'
-import {Navigation} from '@/components/Navbar'
+import {useNavigate} from 'react-router-dom'
+import DashboardSidebar from '@/components/DashboardSidebar'
+import UserHeader from '@/components/UserHeader'
+import {getMenuItems} from '@/components/getMenuItems.tsx'
+import {Card, CardBody} from '@nextui-org/react'
+import {faker} from '@faker-js/faker'
+import {ReactNode, useContext} from 'react'
+import SecurityContext from '@/context/SecurityContext'
 
-interface AccountLayoutProps {
-    leftSidebar: ReactNode;
-
-    mainContent: ReactNode;
-    rightSidebar: ReactNode;
+interface UserDashboardLayoutProps {
+    userName?: string
+    children: ReactNode
 }
 
-const AccountLayout: React.FC<AccountLayoutProps> = ({leftSidebar, mainContent, rightSidebar}) => {
+export default function UserDashboardLayout({userName, children}: UserDashboardLayoutProps) {
+    const navigate = useNavigate()
+    const {logout} = useContext(SecurityContext)
+    const menuItems = getMenuItems(navigate, logout)
+
+    const userPhoto = faker.image.avatar()
+    const coverPhoto = faker.image.urlPicsumPhotos({width: 1200, height: 400})
+
     return (
-        <>
-            <Navigation/>
-            <div className="flex h-screen bg-gray-900 text-white">
-                {/* Left Sidebar */}
-                <aside className="w-1/4 p-4 bg-gray-800">{leftSidebar}</aside>
+        <div className="min-h-screen bg-secondary-900 text-gray-800">
+            <UserHeader coverPhoto={coverPhoto} userPhoto={userPhoto} userName={userName || 'User'}/>
 
-                {/* Main Content */}
-                <main className="flex-grow p-6">{mainContent}</main>
+            <div className="flex mt-16">
+                <DashboardSidebar menuItems={menuItems} onGoBack={() => navigate('/')}/>
 
-                {/* Right Sidebar */}
-                <aside className="w-1/4 p-4 bg-gray-800">{rightSidebar}</aside>
+                <div className="flex-1 p-8">
+                    <Card className="mb-6 shadow-lg">
+                        <CardBody>
+                            <h1 className="text-3xl font-bold text-gray-900">
+                                Welcome {userName || 'User'}!
+                            </h1>
+                            {children}
+                        </CardBody>
+                    </Card>
+                </div>
             </div>
-        </>
+        </div>
     )
 }
-
-export default AccountLayout
