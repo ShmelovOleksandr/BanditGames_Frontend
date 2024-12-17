@@ -39,7 +39,7 @@ export default function UserInfo() {
     ]
 
     return (
-        <AccountLayout title={`Welcome ${attributes.username || 'User'}!`}>
+        <AccountLayout>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {fields.map((field) => (
                     <UserFormField

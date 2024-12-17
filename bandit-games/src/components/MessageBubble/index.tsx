@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import {useState, useEffect} from 'react'
+import {motion} from 'framer-motion'
 
 interface MessageBubbleProps {
     role: 'user' | 'chat';
     content: string;
 }
 
-export default function MessageBubble({ role, content }: MessageBubbleProps) {
+export default function MessageBubble({role, content}: MessageBubbleProps) {
     const [displayText, setDisplayText] = useState('')
 
     useEffect(() => {
@@ -42,9 +42,9 @@ export default function MessageBubble({ role, content }: MessageBubbleProps) {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+            initial={{opacity: 0, y: 10}}
+            animate={{opacity: 1, y: 0}}
+            transition={{duration: 0.2}}
             className={`rounded-lg px-4 py-2 max-w-[70%] whitespace-pre-wrap ${bubbleClasses}`}
         >
             {displayText}
