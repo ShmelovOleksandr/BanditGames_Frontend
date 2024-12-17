@@ -1,60 +1,15 @@
-import {useState, useEffect} from 'react'
-import {motion, AnimatePresence} from 'framer-motion'
-
-const MessageBubble = ({role, content}) => {
-    const [displayText, setDisplayText] = useState('')
-
-    useEffect(() => {
-        if (!content) {
-            setDisplayText('Message unavailable')
-            return
-        }
-
-        if (role === 'user') {
-            setDisplayText(content)
-        } else if (role === 'chat') {
-            let display = ''
-            let currentIndex = 0
-
-            const typingInterval = setInterval(() => {
-                display += content[currentIndex]
-                setDisplayText(display)
-                currentIndex++
-
-                if (currentIndex >= content.length) {
-                    clearInterval(typingInterval)
-                }
-            }, 30)
-
-            return () => clearInterval(typingInterval)
-        }
-    }, [role, content])
-
-    const bubbleClasses =
-        role === 'chat'
-            ? 'bg-gray-200 text-black self-start'
-            : 'bg-blue-500 text-white self-end'
-
-    return (
-        <motion.div
-            initial={{opacity: 0, y: 10}}
-            animate={{opacity: 1, y: 0}}
-            transition={{duration: 0.2}}
-            className={`rounded-lg px-4 py-2 max-w-[70%] whitespace-pre-wrap ${bubbleClasses}`}
-        >
-            {displayText}
-        </motion.div>
-    )
-}
+import {useState} from 'react'
+import {AnimatePresence} from 'framer-motion'
+import MessageBubble from '@/components/MessageBubble'
 
 const Chat = () => {
     const [messages, setMessages] = useState([
-        {role: 'chat', content: 'Hi! How can I help you today?'}
+        {role: 'chat', content: 'Hi! How can I help you today?'},
     ])
     const [userInput, setUserInput] = useState('')
     const [loading, setLoading] = useState(false)
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!userInput.trim()) return
 
