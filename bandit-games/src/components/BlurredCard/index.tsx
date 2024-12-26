@@ -10,14 +10,14 @@ interface BlurredCardProps {
     onBuyClick: () => void;
 }
 
-const BlurredCard: React.FC<BlurredCardProps> = ({
-                                                     title,
-                                                     subtitle,
-                                                     features,
-                                                     price,
-                                                     onPlayClick,
-                                                     onBuyClick,
-                                                 }) => {
+function BlurredCard({
+                         title,
+                         subtitle,
+                         features,
+                         price,
+                         onPlayClick,
+                         onBuyClick,
+                     }: BlurredCardProps) {
     return (
         <motion.div
             className="relative p-8 bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl max-w-md"

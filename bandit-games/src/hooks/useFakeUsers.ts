@@ -1,6 +1,12 @@
 import {faker} from '@faker-js/faker'
 
-export const generateFakeUsers = (count: number) => {
+interface User {
+    name: string;
+    description: string;
+    avatarSrc: string;
+}
+
+export const useFakeUsers = (count: number): User[] => {
     return Array.from({length: count}, () => ({
         name: faker.name.fullName(),
         description: faker.internet.userName(),

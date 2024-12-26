@@ -6,7 +6,7 @@ interface UserProps {
     avatarSrc: string;
 }
 
-const CustomUser: React.FC<UserProps> = ({name, description, avatarSrc}) => {
+function CustomUser({name, description, avatarSrc}: UserProps) {
     return (
         <User
             name={name}

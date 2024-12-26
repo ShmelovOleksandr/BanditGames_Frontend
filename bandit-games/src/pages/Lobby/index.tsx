@@ -1,95 +1,42 @@
 import {Navigation} from '@/components/Navbar'
 import SectionComponent from '@/components/Section'
 import ButtonComponent from '@/components/Button'
-import {useEffect, useState} from 'react'
-import {subtitle, title} from '@/components/primitives.ts'
-import {faker} from '@faker-js/faker'
+import {useSearchParams} from 'react-router-dom'
+import {title} from '@/components/primitives.ts'
 import {Progress, Skeleton, Tooltip} from '@nextui-org/react'
 import {Button} from '@nextui-org/button'
-import {useNavigate, useSearchParams} from 'react-router-dom'
-import {useKeycloak} from '@/hooks/useKeyCloak.ts'
-import useWebSocket from '@/hooks/useWebSocket.ts'
-import {Input} from '@nextui-org/input'
 import SearchInput from '@/components/Search'
+import LobbyChat from '@/components/LobbyChat'
+import {useLobby} from '@/pages/Lobby/useLobby'
+import {useState} from 'react'
+import {faker} from '@faker-js/faker'
 
-
-export const Lobby: React.FC = () => {
+export default function Lobby() {
     const [searchParams] = useSearchParams()
     const gameId = searchParams.get('gameId')
     const gameName = searchParams.get('game')
-    const navigate = useNavigate()
-    const {keycloak} = useKeycloak()
-    const [lobbyPlayers, setLobbyPlayers] = useState([])
 
     const {
-        connectWebSocket,
-        disconnectWebSocket,
-        sendJoinLobbyRequest,
-        sendLeaveLobbyRequest,
-        messages,
-        sendReadyToPlayRequest,
-        isWebSocketReady
-    } = useWebSocket(keycloak)
-    const [isConnected, setIsConnected] = useState(false)
+        lobbyPlayers,
+        handleLeaveLobby,
+        handleReadyToPlay,
+    } = useLobby(gameId)
 
-    const [chat, setChat] = useState([
+    const [chat] = useState([
         {id: 1, sender: 'John', text: 'Hey there!'},
         {id: 2, sender: 'You', text: 'Hi John, how are you?'},
     ])
-    const handleJoinLobby = () => {
-        if (gameId) {
-            sendJoinLobbyRequest(gameId)
-        } else {
-            console.error('Player ID and Game ID are required!')
-        }
-    }
-
-    useEffect(() => {
-        if (keycloak?.authenticated && !isConnected) {
-            connectWebSocket()
-            setIsConnected(true)
-        }
-        if (messages.length > 0) {
-            const latestMessage = messages[messages.length - 1]
-            if (latestMessage.players) {
-                setLobbyPlayers(latestMessage.players)
-            }
-        }
-    }, [keycloak, gameId, messages, lobbyPlayers])
-
-    useEffect(() => {
-        if (isWebSocketReady) {
-            handleJoinLobby()
-        }
-    }, [isWebSocketReady])
-
-    const handleLeaveLobby = () => {
-        sendLeaveLobbyRequest()
-        disconnectWebSocket()
-        setIsConnected(false)
-        setLobbyPlayers([])
-        navigate('/game-library')
-    }
-    const handleRedirect = () => {
-        const token = keycloak.token
-        window.location.href = `http://localhost:5174?token=${token}`
-    }
-    const handleReadyToPlay = () => {
-        sendReadyToPlayRequest()
-        handleRedirect()
-    }
-
 
     return (
         <>
             <Navigation/>
-
             <SectionComponent className="flex h-screen bg-gray-900 text-white">
                 <main className="flex-grow p-6 bg-secondary-50">
+                    {/* Header */}
                     <div className="flex justify-between items-center mb-6">
                         <h1 className={title()}>{gameName}</h1>
 
-                        <Tooltip showArrow={true} placement="left" content="Close lobby and leave the game">
+                        <Tooltip showArrow placement="left" content="Close lobby and leave the game">
                             <div>
                                 <ButtonComponent link="/game-library" text="Leave" actionClick={handleLeaveLobby}/>
                             </div>
@@ -126,7 +73,6 @@ export const Lobby: React.FC = () => {
                                     </div>
                                 ))
                             ) : (
-                                // Skeleton Loader or Placeholder
                                 <div className="flex items-center gap-3">
                                     <Skeleton className="flex rounded-full w-12 h-12"/>
                                     <div className="w-full flex flex-col gap-2">
@@ -136,11 +82,11 @@ export const Lobby: React.FC = () => {
                                 </div>
                             )}
                         </div>
+
                         {/* Add Player Input */}
                         <div className="mt-4 flex items-center gap-4">
                             <SearchInput/>
-                            <Button type="button" className="text-sm font-normal text-default-600 bg-default-100"
-                            >
+                            <Button type="button" className="text-sm font-normal text-default-600 bg-default-100">
                                 Invite Player
                             </Button>
                             {lobbyPlayers.length === 2 && (
@@ -155,35 +101,8 @@ export const Lobby: React.FC = () => {
                     </div>
                 </main>
 
-                {/* Chat */}
-                <aside className="w-1/4 p-4 bg-secondary-100">
-                    <p className={subtitle()}>Chat</p>
-                    <div className="h-64 bg-gray-800 rounded-md p-4 overflow-y-auto space-y-2">
-                        {chat.map((message) => (
-                            <div key={message.id}
-                                 className={`flex ${message.sender === 'You' ? 'justify-end' : 'justify-start'}`}>
-                                <div
-                                    className={`px-4 py-2 rounded-md ${
-                                        message.sender === 'You' ? 'bg-secondary-400 text-white' : 'bg-gray-600 text-white'
-                                    }`}
-                                >
-                                    <strong>{message.sender}:</strong> {message.text}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="mt-4 flex items-center">
-                        <Input
-                            variant="flat"
-                            placeholder="Type a message..."
-                            className="flex-grow px-4 py-2 text-white rounded-l-md focus:outline-none"
-                        />
-                        <ButtonComponent text="Send"/>
-                    </div>
-                </aside>
+                <LobbyChat chat={chat}/>
             </SectionComponent>
         </>
     )
 }
-
-export default Lobby

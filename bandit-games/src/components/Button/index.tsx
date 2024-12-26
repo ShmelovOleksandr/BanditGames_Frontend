@@ -7,7 +7,7 @@ interface ButtonType {
     actionClick?: () => void;
 }
 
-const ButtonComponent: React.FC<ButtonType> = ({link, text, actionClick}) => {
+function ButtonComponent({link, text, actionClick}: ButtonType) {
     const navigate = useNavigate()
 
     const handleClick = () => {

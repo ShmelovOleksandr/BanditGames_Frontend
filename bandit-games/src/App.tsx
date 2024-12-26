@@ -1,15 +1,13 @@
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import './App.css'
-import {Home} from '@/pages/Home'
-import {Catalog} from '@/pages/Catalog'
-import './App.css'
+import Home from '@/pages/Home'
+import Catalog from '@/pages/Catalog'
 import SecurityContextProvider from './context/SecurityContextProvider'
 import GameDetails from '@/pages/Game'
 import Lobby from '@/pages/Lobby'
 import {RouteGuard} from './components/RouteGuard'
 import MyAccount from '@/pages/Account'
-import PersonalInfo from '@/pages/UserInfo/PersonalInfo.tsx'
-import ChangePassword from '@/pages/ChangePassword/ChangePassword.tsx'
+import UserInfo from '@/pages/UserInfo'
 
 
 function App() {
@@ -35,15 +33,7 @@ function App() {
                         path="/personal-info"
                         element={
                             <RouteGuard>
-                                <PersonalInfo/>
-                            </RouteGuard>
-                        }
-                    />
-                    <Route
-                        path="/change-password"
-                        element={
-                            <RouteGuard>
-                                <ChangePassword/>
+                                <UserInfo/>
                             </RouteGuard>
                         }
                     />

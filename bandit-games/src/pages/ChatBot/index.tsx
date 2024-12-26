@@ -1,3 +1,6 @@
+import {useState} from 'react'
+import {AnimatePresence} from 'framer-motion'
+import MessageBubble from '@/components/MessageBubble'
 import {useState, useEffect} from 'react'
 import {motion, AnimatePresence} from 'framer-motion'
 
@@ -56,12 +59,12 @@ const MessageBubble = ({role, content}: MessageBubbleProps) => {
 
 const Chat = () => {
     const [messages, setMessages] = useState([
-        {role: 'chat', content: 'Hi! How can I help you today?'}
+        {role: 'chat', content: 'Hi! How can I help you today?'},
     ])
     const [userInput, setUserInput] = useState('')
     const [loading, setLoading] = useState(false)
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!userInput.trim()) return
 
