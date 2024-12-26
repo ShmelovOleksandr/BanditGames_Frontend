@@ -1,6 +1,8 @@
-import {useState} from 'react'
-import {AnimatePresence} from 'framer-motion'
 import MessageBubble from '@/components/MessageBubble'
+import React, {useState} from 'react'
+import {AnimatePresence} from 'framer-motion'
+
+const apiUrl = import.meta.env.VITE_LOCAL_BASE_URL
 
 const Chat = () => {
     const [messages, setMessages] = useState([
@@ -19,13 +21,16 @@ const Chat = () => {
 
         setLoading(true)
         try {
-            const res = await fetch('http://127.0.0.1:8000/chat', {
+
+            const res = await fetch(`${apiUrl}/api/v1/chat/query`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({query: userInput}),
             })
 
-            if (!res.ok) throw new Error('Network response was not ok')
+            if (!res.ok) throw new Error('Oops! Something went wrong. Please try again.')
 
             const data = await res.json()
 
@@ -37,7 +42,7 @@ const Chat = () => {
             console.error('Error fetching response:', err)
             const errorMessage = {
                 role: 'chat',
-                content: 'Oops! Something went wrong. Please try again.',
+                content: err instanceof Error ? err.message : 'An unknown error occurred.',
             }
             setMessages((prev) => [...prev, errorMessage])
         } finally {
