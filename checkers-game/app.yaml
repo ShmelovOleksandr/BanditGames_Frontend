@@ -1,0 +1,15 @@
+runtime: custom
+env: flex
+
+service: banditgames-app
+
+resources:
+  cpu: 1
+  memory_gb: 4
+  disk_size_gb: 10
+
+vpc_access_connector:
+  name: projects/checkers-integration5/locations/europe-west1/connectors/my-vpc-connector
+
+manual_scaling:
+  instances: 1

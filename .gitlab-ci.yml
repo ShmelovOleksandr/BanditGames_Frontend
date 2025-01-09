@@ -1,0 +1,25 @@
+stages:
+  - build
+  - test
+  - security-test
+  - deploy
+  
+include:
+  - local: '/bandit-games/banditgames-app-gitlab-ci.yml'
+    rules:
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == "main"
+        changes:
+           - 'bandit-games/**/*'
+  
+  - local: '/checkers-game/checkersgame-app-gitlab-ci.yml'
+    rules:
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == "main"
+        changes:
+           - 'checkers-game/**/*'
+
+merge-test:
+  stage: test
+  script:
+    - exit 0
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
