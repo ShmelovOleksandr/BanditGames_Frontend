@@ -8,6 +8,7 @@ import Lobby from '@/pages/Lobby'
 import {RouteGuard} from './components/RouteGuard'
 import MyAccount from '@/pages/Account'
 import UserInfo from '@/pages/UserInfo'
+import FriendsPage from '@/pages/Friends'
 
 
 function App() {
@@ -34,6 +35,14 @@ function App() {
                         element={
                             <RouteGuard>
                                 <UserInfo/>
+                            </RouteGuard>
+                        }
+                    />
+                    <Route
+                        path="/friends"
+                        element={
+                            <RouteGuard>
+                                <FriendsPage/>
                             </RouteGuard>
                         }
                     />
