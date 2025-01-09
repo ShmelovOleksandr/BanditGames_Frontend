@@ -1,7 +1,7 @@
 runtime: custom
 env: flex
 
-service: banditgames-app
+service: checkersgame-app
 
 resources:
   cpu: 1

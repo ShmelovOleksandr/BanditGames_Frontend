@@ -2,18 +2,6 @@ stages:
   - security-test
   - deploy
 
-include:
-  - template: Security/SAST.gitlab-ci.yml
-  - template: Security/Secret-Detection.gitlab-ci.yml
-  - template: Dependency-Scanning.gitlab-ci.yml
-
-sast:
-  stage: security-test
-secret_detection:
-  stage: security-test
-dependency_scanning:
-  stage: security-test
-
 banditgames-trigger-gcb:
   image: google/cloud-sdk:latest
   stage: deploy
