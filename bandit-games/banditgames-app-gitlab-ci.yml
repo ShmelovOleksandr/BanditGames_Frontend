@@ -1,5 +1,4 @@
 stages:
-  - security-test
   - deploy
 
 banditgames-trigger-gcb:

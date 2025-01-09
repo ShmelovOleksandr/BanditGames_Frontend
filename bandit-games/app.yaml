@@ -1,4 +1,4 @@
-runtime: custom
+runtime: nodejs18
 env: flex
 
 service: banditgames-app
