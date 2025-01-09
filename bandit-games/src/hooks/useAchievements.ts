@@ -15,11 +15,16 @@ export function useAchievements() {
     const {keycloak} = useKeycloak()
     const userId = keycloak.tokenParsed?.sub
 
+    const baseUrl = import.meta.env.VITE_ACHIEVEMENT_API_URL
+    console.log(baseUrl)
+    const achievementsApiUrl = baseUrl.replace('(playerId)', userId)
+    console.log('achievementsApiUrl', achievementsApiUrl)
 
     return useQuery<Achievement[], Error>({
         queryKey: ['achievements'], // Query key
         queryFn: async () => {
-            const response = await axios.get('http://localhost:8043/api/v1/players/' + userId + '/achievements') // Replace with your actual API endpoint
+
+            const response = await axios.get(achievementsApiUrl) // Replace with your actual API endpoint
             response.data.forEach(achievement => achievement.imageUrl = faker.image.urlPicsumPhotos({ width: 1200, height: 400 }))
             return response.data
         },
