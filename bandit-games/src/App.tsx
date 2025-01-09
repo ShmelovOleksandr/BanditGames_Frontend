@@ -9,6 +9,7 @@ import {RouteGuard} from './components/RouteGuard'
 import MyAccount from '@/pages/Account'
 import UserInfo from '@/pages/UserInfo'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import FriendsPage from '@/pages/Friends'
 
 const queryClient = new QueryClient()
 
@@ -37,6 +38,14 @@ function App() {
                             element={
                                 <RouteGuard>
                                     <UserInfo/>
+                                </RouteGuard>
+                            }
+                        />
+                        <Route
+                            path="/friends"
+                            element={
+                                <RouteGuard>
+                                    <FriendsPage/>
                                 </RouteGuard>
                             }
                         />

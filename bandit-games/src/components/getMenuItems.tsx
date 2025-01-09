@@ -35,6 +35,11 @@ export function getMenuItems(navigate: NavigateFunction, logout: () => void) {
             action: () => navigate(siteConfig.links.library),
         },
         {
+            title: 'Friends',
+            icon: <IconWrapper><UserIcon/></IconWrapper>,
+            action: () => navigate('/friends'),
+        },
+        {
             title: 'Logout',
             icon: <IconWrapper><ArrowLeftOnRectangleIcon/></IconWrapper>,
             action: logout,
