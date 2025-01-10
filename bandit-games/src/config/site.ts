@@ -15,6 +15,10 @@ export const siteConfig = {
             label: 'My Account',
             href: 'my-account',
         },
+        {
+            label: 'Admin',
+            href: 'admin',
+        }
 
     ],
     //TODO: change links

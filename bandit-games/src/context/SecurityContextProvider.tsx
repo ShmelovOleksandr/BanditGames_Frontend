@@ -11,6 +11,7 @@ export default function SecurityContextProvider({children}: IWithChildren) {
     const [authState, setAuthState] = useState(keycloak.authenticated || false)
     const [loggedInUser, setLoggedInUser] = useState<string | undefined>(undefined)
     const [userInfo, setUserInfo] = useState<any>(null)
+    const [userRoles, setUserRoles] = useState<string[]>([]);
     const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
@@ -19,6 +20,7 @@ export default function SecurityContextProvider({children}: IWithChildren) {
                 if (authenticated) {
                     addAccessTokenToAuthHeader(keycloak.token)
                     setLoggedInUser(keycloak.idTokenParsed?.given_name)
+                    setUserRoles(keycloak.realmAccess?.roles || [])
                     await fetchUserInfo(keycloak.token)
                     await sendTokenToBackend(keycloak.token)
                     setAuthState(true)
@@ -84,24 +86,30 @@ export default function SecurityContextProvider({children}: IWithChildren) {
     keycloak.onAuthSuccess = async () => {
         addAccessTokenToAuthHeader(keycloak.token)
         setLoggedInUser(keycloak.idTokenParsed?.given_name)
+        setUserRoles(keycloak.realmAccess?.roles || []);
         await fetchUserInfo(keycloak.token)
     }
 
     keycloak.onAuthLogout = () => {
         removeAccessTokenFromAuthHeader()
         setUserInfo(null)
+        setUserRoles([])
         setAuthState(false)
     }
 
     keycloak.onTokenExpired = () => {
         keycloak.updateToken(-1).then(async () => {
             addAccessTokenToAuthHeader(keycloak.token)
+            setUserRoles(keycloak.realmAccess?.roles || []);
             await fetchUserInfo(keycloak.token)
         }).catch(() => {
             console.log('Token refresh failed. Logging out.')
             keycloak.logout()
         })
     }
+    const hasRoles = (roles: string[]) => {
+        return roles.some((role) => userRoles.includes(role));
+    };
 
     const login = () => keycloak.login()
     const logout = () => keycloak.logout({redirectUri: import.meta.env.VITE_REACT_APP_URL})
@@ -109,7 +117,7 @@ export default function SecurityContextProvider({children}: IWithChildren) {
     if (!isInitialized) return <div>Loading...</div>
 
     return (
-        <SecurityContext.Provider value={{isAuthenticated: authState, loggedInUser, userInfo, login, logout, keycloak}}>
+        <SecurityContext.Provider value={{isAuthenticated: authState, loggedInUser, userInfo, login, logout, hasRoles, keycloak}}>
             {children}
         </SecurityContext.Provider>
     )
