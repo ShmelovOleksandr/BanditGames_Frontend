@@ -5,7 +5,7 @@ export const siteConfig = {
     navItems: [
         {
             label: 'Home',
-            href: '/',
+            href: '',
         },
         {
             label: 'Game Library',
