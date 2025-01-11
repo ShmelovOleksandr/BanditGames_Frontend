@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "gcp-build": "tsc --noEmit && vite build",
-    "start": "vite--port $PORT",
+    "start": "vite å--port $PORT",
     "lint": "eslint .",
     "preview": "vite preview"
   },
