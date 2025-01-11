@@ -4,7 +4,7 @@ env: standard
 service: banditgames-app
 
 vpc_access_connector:
-  name: projects/checkers-integration5/locations/europe-west1/connectors/my-vpc-connector
+  name: projects/checkers-test-447118/locations/europe-west1/connectors/my-vpc-connector
 
 manual_scaling:
   instances: 1
