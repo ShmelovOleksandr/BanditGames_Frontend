@@ -7,7 +7,9 @@ import path from 'path'
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: 'build', // Ensure the build output is in build
+    outDir: 'dist', // Output directory for the build
+    assetsDir: 'assets', // Directory for static assets
+    sourcemap: false, // Disable source maps for production
   },
   resolve: {
     alias: {
