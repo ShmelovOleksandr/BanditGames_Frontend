@@ -5,7 +5,7 @@ export const siteConfig = {
     navItems: [
         {
             label: 'Home',
-            href: '/',
+            href: '',
         },
         {
             label: 'Game Library',
@@ -15,6 +15,10 @@ export const siteConfig = {
             label: 'My Account',
             href: 'my-account',
         },
+        {
+            label: 'Admin',
+            href: 'admin',
+        }
 
     ],
     //TODO: change links

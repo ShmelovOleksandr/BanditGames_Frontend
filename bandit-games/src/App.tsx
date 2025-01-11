@@ -8,10 +8,12 @@ import Lobby from '@/pages/Lobby'
 import {RouteGuard} from './components/RouteGuard'
 import MyAccount from '@/pages/Account'
 import UserInfo from '@/pages/UserInfo'
+import Admin from "@/pages/Admin";
+import {RoleBasedRouteGuard} from "@/components/RoleBasedRouteGuard.tsx";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import FriendsPage from '@/pages/Friends'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 function App() {
     return (
@@ -25,6 +27,14 @@ function App() {
                         <Route path="/game-library" element={<Catalog/>}/>
                         <Route path="/game-library/game" element={<GameDetails/>}/>
                         <Route path="/lobby" element={<Lobby/>}/>
+                        <Route
+                            path="/admin"
+                            element={
+                                <RoleBasedRouteGuard requiredRoles={['admin']}>
+                                    <Admin/>
+                                </RoleBasedRouteGuard>
+                            }
+                        />
                         <Route
                             path="/my-account"
                             element={
