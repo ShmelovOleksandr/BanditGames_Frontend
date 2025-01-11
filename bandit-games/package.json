@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "gcp-build": "tsc --noEmit && vite build",
-    "start": "vite --port $PORT",
+    "gcp-build": "npm run build",
+    "start": "serve -s dist -l 8080",
     "lint": "eslint .",
     "preview": "vite preview"
   },
