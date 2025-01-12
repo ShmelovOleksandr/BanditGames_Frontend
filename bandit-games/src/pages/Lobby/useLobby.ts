@@ -4,10 +4,11 @@ import {useKeycloak} from '@/hooks/useKeyCloak'
 import {useNavigate} from 'react-router-dom'
 
 export function useLobby(gameId: string | null) {
-    const {keycloak} = useKeycloak()
-    const navigate = useNavigate()
-    const [lobbyPlayers, setLobbyPlayers] = useState([])
-    const [isConnected, setIsConnected] = useState(false)
+    const {keycloak} = useKeycloak();
+    const navigate = useNavigate();
+    const [lobbyPlayers, setLobbyPlayers] = useState([]);
+    const [isConnected, setIsConnected] = useState(false);
+    const [lobbyId, setLobbyId] = useState(null)
 
     const {
         connectWebSocket,
@@ -39,6 +40,9 @@ export function useLobby(gameId: string | null) {
         sendReadyToPlayRequest()
     }
 
+
+    // Process messages received from backend
+
     useEffect(() => {
         if (keycloak?.authenticated && !isConnected) {
             connectWebSocket()
@@ -47,9 +51,20 @@ export function useLobby(gameId: string | null) {
 
         if (messages.length > 0) {
             const latestMessage = messages[messages.length - 1]
+
+            if (latestMessage.lobbyId) setLobbyId(latestMessage.lobbyId)
+
             if (latestMessage.players) {
                 setLobbyPlayers(latestMessage.players)
             }
+
+            if (latestMessage.frontendUrl) {
+                window.location.href = `${latestMessage.frontendUrl}/${lobbyId}`;
+            }
+
+            console.log(`Received message: ${JSON.stringify(latestMessage)}`)
+
+
         }
     }, [keycloak, gameId, messages])
 
