@@ -1,15 +1,25 @@
 import {GameState} from "@/model/GameState.ts";
+import {useEffect, useState} from "react";
+import {useWebSocket} from "@/hooks/useWebSocket.ts";
+import {useKeycloak} from "@/hooks/useKeyCloak.ts";
 
-interface TurnDisplayProps {
-    game: GameState | undefined;
-    loggedInUser: string | undefined;
+export const TurnDisplay = () => {
 
-}
+    const {messages} = useWebSocket()
+    const {loggedInUser, userId} = useKeycloak();
+    const [game, setGame] = useState<GameState>()
 
-export const TurnDisplay = ({game, loggedInUser}: TurnDisplayProps) => {
 
-    const isCurrentTurn = game?.currentPlayer === loggedInUser;
-    const currentPlayer = game?.players.find((p) => p.username === loggedInUser);
+    useEffect(() => {
+        const latestMessage = messages[messages.length - 1];
+        if (latestMessage && ('pieces' in latestMessage)) {
+            const gameState = latestMessage as GameState;
+            setGame(gameState);
+        }
+    });
+
+    const isCurrentTurn = game?.currentPlayer === userId;
+    const currentPlayer = game?.players.find((p) => p.playerId === userId);
     const playerColor = currentPlayer?.color;
 
     return (
