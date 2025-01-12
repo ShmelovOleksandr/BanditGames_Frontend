@@ -5,6 +5,8 @@ import {useKeycloak} from "@/hooks/useKeyCloak.ts";
 import useGameUUID from "@/hooks/useGameUUID.ts";
 import {TurnDisplay} from "@/components/TurnDisplay";
 import backgroundImage from '@/assets/BACKGROUND_WOOD.webp';
+import {useGame} from "@/hooks/useGame.ts";
+import {EndModal} from "@/components/EndModal";
 
 
 export const  Main = () => {
@@ -13,6 +15,7 @@ export const  Main = () => {
     const {isAuthenticated} = useKeycloak()
     const {connectWebSocket, isWebSocketReady, sendGetGameStateRequest} = useWebSocket()
     const gameUUID = useGameUUID();
+    const {isFinished, gameState} = useGame();
 
     useEffect(() => {
         if (isAuthenticated() && !isConnected) {
@@ -27,14 +30,14 @@ export const  Main = () => {
         }
     }, [isWebSocketReady])
 
-
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 bg-cover bg-center"
              style={{ backgroundImage: `url(${backgroundImage})` }}>
             <TurnDisplay/>
-            {/* Game Board */}
             <GameBoard/>
-
+            {isFinished &&
+                <EndModal gameState={gameState} isFinished={isFinished}></EndModal>
+            }
         </div>
     )
 }
