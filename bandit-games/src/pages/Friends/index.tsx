@@ -58,7 +58,7 @@ export default function FriendsPage() {
             })
     }
 
-    const handleSendRequest = (receiverId: string) => {
+    const handleSendRequest = (receiverId) => {
         fetch(`${apiUrl}/api/v1/friends/send?senderId=${playerId}&receiverId=${receiverId}`, {
             method: 'POST',
             headers: {
@@ -69,7 +69,6 @@ export default function FriendsPage() {
                 if (!res.ok) {
                     throw new Error('Failed to send request')
                 }
-                return res.json()
             })
             .then(() => {
                 alert('Friend request sent!')
@@ -103,6 +102,31 @@ export default function FriendsPage() {
                 setError('Failed to respond to request')
             })
     }
+
+
+    useEffect(() => {
+        fetch(`${apiUrl}/api/v1/friends/pending?playerId=${playerId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${keycloak?.token}`,
+            },
+        })
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error('Failed to fetch pending requests')
+                }
+                return res.json()
+            })
+            .then((data) => {
+                console.log('Pending Requests:', data)
+                setPendingRequests(data)
+            })
+            .catch((err) => {
+                console.error('Error fetching pending requests:', err)
+                setError('Failed to load pending requests')
+            })
+    }, [keycloak?.token, playerId])
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-purple-950 text-white">
