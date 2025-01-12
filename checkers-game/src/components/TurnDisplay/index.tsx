@@ -20,14 +20,15 @@ export const TurnDisplay = () => {
 
     const isCurrentTurn = game?.currentPlayer === userId;
     const currentPlayer = game?.players.find((p) => p.playerId === userId);
-    const playerColor = currentPlayer?.color;
+    let playerColor = currentPlayer?.color || "";
+    playerColor = playerColor === "WHITE" ? "BLACK" : playerColor === "BLACK" ? "WHITE" : "";
 
     return (
         <div className="mb-4 px-6 py-3 rounded-lg shadow-md bg-white border border-gray-200 flex items-center justify-center">
             <p className={`text-lg font-semibold ${isCurrentTurn ? "text-green-600" : "text-gray-700"}`}>
                 {isCurrentTurn
                     ? `${loggedInUser} Turn (${playerColor})`
-                    : `Opponent's Turn (${playerColor === "WHITE" ? "BLACK" : "WHITE"})`}
+                    : `Opponent's Turn (${playerColor})`}
             </p>
         </div>
     );
