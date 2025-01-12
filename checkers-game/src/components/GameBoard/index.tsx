@@ -146,6 +146,7 @@ const GameBoard = () => {
                                                         ? () => handlePieceClick(valueY, valueX, piece.pieceColor)
                                                         : undefined
                                                 }
+                                                isKing={piece.isKing}
                                             />
                                         )}
                                     </Square>

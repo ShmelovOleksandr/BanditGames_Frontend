@@ -1,8 +1,8 @@
 import './App.css'
-import GameBoard from "@/components/GameBoard/index.tsx";
 import SecurityContextProvider from "@/context/SecurityContextProvider.tsx";
 import {RouteGuard} from "@/context/RouteGuard.tsx";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {Main} from "@/pages/Main";
 
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
                         path="/:game_uuid"
                         element={
                             <RouteGuard>
-                                <GameBoard/>
+                                <Main/>
                             </RouteGuard>
                         }
                     />

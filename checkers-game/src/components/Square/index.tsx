@@ -14,7 +14,7 @@ const Square: React.FC<SquareProps> = ({ isDark, isHighlighted, children, onClic
                 isHighlighted
                     ? "bg-yellow-400" 
                     : isDark
-                        ? "bg-gray-800" 
+                        ? "bg-gray-600" 
                         : "bg-gray-200" 
             }`}
             onClick={onClick}
