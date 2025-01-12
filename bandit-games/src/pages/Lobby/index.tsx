@@ -19,7 +19,7 @@ export default function Lobby() {
     const {
         lobbyPlayers,
         handleLeaveLobby,
-        handleReadyToPlay,
+        handleReadyToPlay
     } = useLobby(gameId)
 
     const [chat] = useState([
