@@ -1,13 +1,13 @@
 import {useEffect, useState} from "react";
 import Piece from "@/components/Piece";
 import BoardLayout from "@/layouts/boardLayout.tsx";
-import useWebSocket from "@/hooks/useWebSocket.ts";
 import {useKeycloak} from "@/hooks/useKeyCloak.ts";
 import Square from "@/components/Square";
 import {GameState, PieceData} from "@/model/GameState.ts";
 import useGameUUID from "@/hooks/useGameUUID.ts";
 import {Move} from "@/model/Move.ts";
 import {Position} from "@/model/Position.ts";
+import {useWebSocket} from "@/hooks/useWebSocket.ts";
 
 interface SelectedPiece {
     valueX: number;
