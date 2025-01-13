@@ -100,9 +100,8 @@ export default function Lobby() {
                         </div>
                     </div>
                 </main>
-
-                <LobbyChat chat={chat}/>
+                <aside className="w-1/4 p-4 bg-secondary-100"> </aside>
             </SectionComponent>
         </>
-    )
+)
 }
