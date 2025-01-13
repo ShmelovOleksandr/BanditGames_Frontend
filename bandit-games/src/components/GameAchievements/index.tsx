@@ -45,12 +45,16 @@ export const GameAchievements = ({ backendUrl }: GameAchievementsProps) => {
     console.log("Display player Achievemet")
     console.log(JSON.stringify(playerAchievements))
 
-    const mergedAchievements: Achievement[] = achievements.map((achievement) => ({
-        ...achievement,
-        isAchieved: playerAchievements.length === 0 ? false : playerAchievements.some(
-            (playerAch) => playerAch.achievementId === achievement.achievementId
-        ),
-    }));
+    let mergedAchievements: Achievement[] = []
+    if (achievements) {
+        mergedAchievements = achievements.map((achievement) => ({
+            ...achievement,
+            isAchieved: playerAchievements.length === 0 ? false : playerAchievements.some(
+                (playerAch) => playerAch.achievementId === achievement.achievementId
+            ),
+        }));
+    }
+
 
     return (
         <div className="flex justify-center shadow-lg rounded-lg py-12">
