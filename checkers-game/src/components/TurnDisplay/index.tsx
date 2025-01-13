@@ -20,8 +20,11 @@ export const TurnDisplay = () => {
 
     const isCurrentTurn = game?.currentPlayer === userId;
     const currentPlayer = game?.players.find((p) => p.playerId === userId);
-    let playerColor = currentPlayer?.color || "";
-    playerColor = playerColor === "WHITE" ? "BLACK" : playerColor === "BLACK" ? "WHITE" : "";
+    let playerColor = currentPlayer?.color;
+
+    if (!isCurrentTurn) {
+        playerColor = playerColor === "BLACK" ? "WHITE" : "BLACK";
+    }
 
     return (
         <div className="mb-4 px-6 py-3 rounded-lg shadow-md bg-white border border-gray-200 flex items-center justify-center">
