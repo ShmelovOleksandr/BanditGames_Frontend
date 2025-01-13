@@ -13,6 +13,10 @@ export default function FriendsPage() {
     const [foundUser, setFoundUser] = useState(null)
     const [error, setError] = useState<string | null>(null)
 
+    useEffect(() => {
+        fetchFriends()
+    }, [keycloak?.token])
+
     const fetchFriends = () => {
         fetch(`${apiUrl}/api/v1/players/${playerId}/friends`, {
             method: 'GET',
@@ -22,6 +26,7 @@ export default function FriendsPage() {
         })
             .then(async (res) => {
                 const data = await res.json()
+                console.log('Fetched Friends Data:', data) // Debugging
                 setFriends(data)
             })
             .catch((err) => {
@@ -30,9 +35,7 @@ export default function FriendsPage() {
             })
     }
 
-    useEffect(() => {
-        fetchFriends()
-    }, [keycloak?.token])
+
 
     const handleSearch = () => {
         fetch(`${apiUrl}/api/v1/players?username=${username}`, {
@@ -59,7 +62,7 @@ export default function FriendsPage() {
     }
 
     const handleSendRequest = (receiverId) => {
-        fetch(`${apiUrl}/api/v1/friends/send?senderId=${playerId}&receiverId=${receiverId}`, {
+        fetch(`${apiUrl}/api/v1/friends/send/${playerId}/${receiverId}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${keycloak?.token}`,
@@ -105,7 +108,7 @@ export default function FriendsPage() {
 
 
     useEffect(() => {
-        fetch(`${apiUrl}/api/v1/friends/pending?playerId=${playerId}`, {
+        fetch(`${apiUrl}/api/v1/friends/pending/${playerId}`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${keycloak?.token}`,
@@ -155,14 +158,14 @@ export default function FriendsPage() {
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold mb-4">Your Friends</h2>
                     <ul>
-                        {Array.isArray(friends) && friends.length > 0 ? (
-                            friends.map((friend: any) => (
-                                <li key={friend.id} className="mb-2 bg-purple-700 p-3 rounded">
-                                    {friend.username} <span>(ID: {friend.id})</span>
+                        {friends.length > 0 ? (
+                            friends.map((friend) => (
+                                <li key={friend.uuid} className="mb-2 bg-purple-700 p-3 rounded">
+                                    {friend.username}
                                 </li>
                             ))
                         ) : (
-                            <p className="text-center">No friends found</p>
+                            <p>No friends found</p>
                         )}
                     </ul>
                 </div>
