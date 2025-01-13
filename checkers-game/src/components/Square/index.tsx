@@ -7,14 +7,14 @@ interface SquareProps {
     onClick?: () => void;
 }
 
-const Square: React.FC<SquareProps> = ({ isDark, isHighlighted, children, onClick }) => {
+const Square = ({ isDark, isHighlighted, children, onClick }: SquareProps) => {
     return (
         <div
             className={`flex justify-center items-center ${
                 isHighlighted
                     ? "bg-yellow-400" 
                     : isDark
-                        ? "bg-gray-800" 
+                        ? "bg-gray-600" 
                         : "bg-gray-200" 
             }`}
             onClick={onClick}

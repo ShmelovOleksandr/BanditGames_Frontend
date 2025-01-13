@@ -12,6 +12,9 @@ export interface PieceData {
 }
 
 export interface GameState {
+    isFinished: boolean;
+    winnerId: string;
+    isDraw: boolean;
     currentPlayer: string;
     players: Player[];
     pieces: PieceData[];

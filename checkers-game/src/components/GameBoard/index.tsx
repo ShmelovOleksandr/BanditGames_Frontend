@@ -1,13 +1,13 @@
 import {useEffect, useState} from "react";
 import Piece from "@/components/Piece";
 import BoardLayout from "@/layouts/boardLayout.tsx";
-import useWebSocket from "@/hooks/useWebSocket.ts";
 import {useKeycloak} from "@/hooks/useKeyCloak.ts";
 import Square from "@/components/Square";
 import {GameState, PieceData} from "@/model/GameState.ts";
 import useGameUUID from "@/hooks/useGameUUID.ts";
 import {Move} from "@/model/Move.ts";
 import {Position} from "@/model/Position.ts";
+import {useWebSocket} from "@/hooks/useWebSocket.ts";
 
 interface SelectedPiece {
     valueX: number;
@@ -17,16 +17,13 @@ interface SelectedPiece {
 
 const GameBoard = () => {
     const [selectedPiece, setSelectedPiece] = useState<SelectedPiece | null>(null);
-    const {isAuthenticated, userId} = useKeycloak();
+    const {userId} = useKeycloak();
     const {
-        connectWebSocket,
-        sendGetGameStateRequest,
         sendGetPiecePossibleMoves,
         sendMovePieceRequest,
         messages,
-        isWebSocketReady
     } = useWebSocket();
-    const [isConnected, setIsConnected] = useState(false)
+
 
     const [highlightedSquares, setHighlightedSquares] = useState<Position[]>([])
     const [possibleMoves, setPossibleMoves] = useState<Move[]>([])
@@ -34,21 +31,6 @@ const GameBoard = () => {
     const [playerColor, setPlayerColor] = useState<string | null>(null);
     const gameUUID = useGameUUID();
     const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
-
-
-    useEffect(() => {
-     if (isAuthenticated() && !isConnected) {
-        connectWebSocket();
-        setIsConnected(true);
-     }
-    }, [isAuthenticated, isConnected, connectWebSocket]);
-
-    useEffect(() => {
-        if (isWebSocketReady && gameUUID) {
-            sendGetGameStateRequest(gameUUID);
-        }
-    }, [isWebSocketReady])
-
 
     useEffect(() => {
         const latestMessage = messages[messages.length - 1];
@@ -66,7 +48,6 @@ const GameBoard = () => {
         if (latestMessage && ('moves' in latestMessage)) {
             const moves = latestMessage.moves as Move[];
             const finalPositions = moves.map((move) => move.finalPosition);
-            console.log(`Current player ${currentPlayerId} player selected ${userId}`)
             setPossibleMoves(moves);
             setHighlightedSquares(finalPositions);
 
@@ -146,6 +127,7 @@ const GameBoard = () => {
                                                         ? () => handlePieceClick(valueY, valueX, piece.pieceColor)
                                                         : undefined
                                                 }
+                                                isKing={piece.isKing}
                                             />
                                         )}
                                     </Square>

@@ -1,0 +1,10 @@
+stages:
+  - deploy
+
+banditgames-trigger-gcb:
+  image: google/cloud-sdk:latest
+  stage: deploy
+  identity: google_cloud
+  script:
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud builds triggers run banditgames-app --region=europe-west1
