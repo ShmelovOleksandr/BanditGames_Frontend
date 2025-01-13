@@ -12,7 +12,7 @@ import {useFetch} from '@/hooks/useFetch'
 import {useFilteredGames} from '@/hooks/useFilteredGames'
 import {faker} from '@faker-js/faker'
 
-interface Game {
+export interface Game {
     gameId: string;
     title: string;
     description: string;

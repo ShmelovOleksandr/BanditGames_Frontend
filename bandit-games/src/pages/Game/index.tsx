@@ -7,7 +7,7 @@ import BlurredCard from '@/components/BlurredCard'
 import ReviewsSection from '@/components/Reviews'
 import Bubble from '@/components/GameTypeBubble'
 import {useFetch} from '@/hooks/useFetch'
-import {faker} from '@faker-js/faker'
+import {GameAchievements} from "@/components/GameAchievements";
 
 
 interface Game {
@@ -16,7 +16,8 @@ interface Game {
     description: string;
     priceAmount: number;
     currencyCode: string;
-    imageUrl?: string;
+    backendUrl: string;
+    gameImageUrl: string;
 }
 
 
@@ -27,12 +28,7 @@ function GameDetails() {
     const {data: game, error, loading} = useFetch<Game>(`/api/v1/games/${gameId}`)
 
     // Add imageUrl dynamically
-    const gameWithImage = game
-        ? {
-            ...game,
-            imageUrl: faker.image.url({width: 640, height: 480, category: 'game'}),
-        }
-        : null
+    const gameWithImage = game ? {...game} : null
 
     if (loading) {
         return (
@@ -52,7 +48,7 @@ function GameDetails() {
             <SectionComponent>
                 <div
                     className="relative flex items-center justify-center h-[100vh] bg-cover bg-center"
-                    style={{backgroundImage: `url('${gameWithImage.imageUrl}')`}}
+                    style={{backgroundImage: `url('${gameWithImage.gameImageUrl}')`}}
                 >
                     <div className="absolute bottom-14 left-12 flex flex-col items-start space-y-4">
                         <p className={`${title({color: 'white', postion: 'left'})} text-2xl sm:text-3xl md:text-4xl`}>
@@ -87,6 +83,11 @@ function GameDetails() {
                         onBuyClick={() => console.log('Buy clicked!')}
                     />
                 </div>
+            </SectionComponent>
+
+            {/* Achievements Section */}
+            <SectionComponent>
+                <GameAchievements backendUrl={game?.backendUrl}/>
             </SectionComponent>
 
             {/* Reviews Section */}

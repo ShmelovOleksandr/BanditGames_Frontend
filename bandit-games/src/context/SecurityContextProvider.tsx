@@ -13,6 +13,7 @@ export default function SecurityContextProvider({children}: IWithChildren) {
     const [userInfo, setUserInfo] = useState<any>(null)
     const [userRoles, setUserRoles] = useState<string[]>([]);
     const [isInitialized, setIsInitialized] = useState(false)
+    const [userId, setUserId] = useState<string | undefined>(undefined)
 
     useEffect(() => {
         keycloak.init({onLoad: 'check-sso'})
@@ -21,6 +22,7 @@ export default function SecurityContextProvider({children}: IWithChildren) {
                     addAccessTokenToAuthHeader(keycloak.token)
                     setLoggedInUser(keycloak.idTokenParsed?.given_name)
                     setUserRoles(keycloak.realmAccess?.roles || [])
+                    setUserId(keycloak.tokenParsed?.sub)
                     await fetchUserInfo(keycloak.token)
                     await sendTokenToBackend(keycloak.token)
                     setAuthState(true)
@@ -87,6 +89,7 @@ export default function SecurityContextProvider({children}: IWithChildren) {
         addAccessTokenToAuthHeader(keycloak.token)
         setLoggedInUser(keycloak.idTokenParsed?.given_name)
         setUserRoles(keycloak.realmAccess?.roles || []);
+        setUserId(keycloak.tokenParsed?.sub)
         await fetchUserInfo(keycloak.token)
     }
 
@@ -95,12 +98,14 @@ export default function SecurityContextProvider({children}: IWithChildren) {
         setUserInfo(null)
         setUserRoles([])
         setAuthState(false)
+        setUserId(undefined)
     }
 
     keycloak.onTokenExpired = () => {
         keycloak.updateToken(-1).then(async () => {
             addAccessTokenToAuthHeader(keycloak.token)
             setUserRoles(keycloak.realmAccess?.roles || []);
+            setUserId(keycloak.tokenParsed?.sub)
             await fetchUserInfo(keycloak.token)
         }).catch(() => {
             console.log('Token refresh failed. Logging out.')
@@ -117,7 +122,7 @@ export default function SecurityContextProvider({children}: IWithChildren) {
     if (!isInitialized) return <div>Loading...</div>
 
     return (
-        <SecurityContext.Provider value={{isAuthenticated: authState, loggedInUser, userInfo, login, logout, hasRoles, keycloak}}>
+        <SecurityContext.Provider value={{isAuthenticated: authState, loggedInUser, userInfo, userId, login, logout, hasRoles, keycloak}}>
             {children}
         </SecurityContext.Provider>
     )

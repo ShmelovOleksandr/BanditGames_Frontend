@@ -4,6 +4,7 @@ import Keycloak from "keycloak-js";
 export interface ISecurityContext {
     isAuthenticated: () => boolean; // Function that returns a boolean
     loggedInUser: string | undefined;
+    userId: string | undefined;
     userInfo: string | undefined;
     login: () => void;
     logout: () => void;
@@ -15,6 +16,7 @@ export interface ISecurityContext {
 const SecurityContext = createContext<ISecurityContext>({
     isAuthenticated: () => false, // Default to always return false
     loggedInUser: undefined,
+    userId: undefined,
     userInfo: undefined,
     login: () => {},
     logout: () => {},
