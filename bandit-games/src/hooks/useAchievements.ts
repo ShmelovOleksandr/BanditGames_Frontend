@@ -13,12 +13,9 @@ interface Achievement {
 
 export function useAchievements() {
     const {keycloak} = useKeycloak()
-    const userId = keycloak.tokenParsed?.sub
-
+    const userId = keycloak?.tokenParsed?.sub
     const baseUrl = import.meta.env.VITE_ACHIEVEMENT_API_URL
-    console.log(baseUrl)
-    const achievementsApiUrl = baseUrl.replace('(playerId)', userId)
-    console.log('achievementsApiUrl', achievementsApiUrl)
+    const achievementsApiUrl = `${baseUrl}/api/v1/players/${userId}/achievements`
 
     return useQuery<Achievement[], Error>({
         queryKey: ['achievements'], // Query key
