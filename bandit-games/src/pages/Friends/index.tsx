@@ -13,6 +13,10 @@ export default function FriendsPage() {
     const [foundUser, setFoundUser] = useState(null)
     const [error, setError] = useState<string | null>(null)
 
+    useEffect(() => {
+        fetchFriends()
+    }, [keycloak?.token])
+
     const fetchFriends = () => {
         fetch(`${apiUrl}/api/v1/players/${playerId}/friends`, {
             method: 'GET',
@@ -22,6 +26,7 @@ export default function FriendsPage() {
         })
             .then(async (res) => {
                 const data = await res.json()
+                console.log('Fetched Friends Data:', data) // Debugging
                 setFriends(data)
             })
             .catch((err) => {
@@ -30,9 +35,7 @@ export default function FriendsPage() {
             })
     }
 
-    useEffect(() => {
-        fetchFriends()
-    }, [keycloak?.token])
+
 
     const handleSearch = () => {
         fetch(`${apiUrl}/api/v1/players?username=${username}`, {
@@ -58,8 +61,8 @@ export default function FriendsPage() {
             })
     }
 
-    const handleSendRequest = (receiverId: string) => {
-        fetch(`${apiUrl}/api/v1/friends/send?senderId=${playerId}&receiverId=${receiverId}`, {
+    const handleSendRequest = (receiverId) => {
+        fetch(`${apiUrl}/api/v1/friends/send/${playerId}/${receiverId}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${keycloak?.token}`,
@@ -69,7 +72,6 @@ export default function FriendsPage() {
                 if (!res.ok) {
                     throw new Error('Failed to send request')
                 }
-                return res.json()
             })
             .then(() => {
                 alert('Friend request sent!')
@@ -80,29 +82,54 @@ export default function FriendsPage() {
             })
     }
 
-    const handleResponse = (requestId: string, accepted: boolean) => {
-        fetch(`${apiUrl}/api/v1/friends/respond`, {
+
+    const handleResponse = (requestId, accepted) => {
+        fetch(`${apiUrl}/api/v1/friends/respond/${requestId}/${accepted}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${keycloak?.token}`,
             },
-            body: JSON.stringify({ requestId, accepted }),
         })
             .then((res) => {
+                console.log(`Request ID: ${requestId}, Accepted: ${accepted}`)
                 if (!res.ok) {
                     throw new Error('Failed to respond to request')
                 }
-                return res.json()
             })
             .then(() => {
                 alert(`Request ${accepted ? 'accepted' : 'declined'}!`)
-                fetchFriends()
+                fetchFriends() // Refresh the friends list
             })
             .catch((err) => {
                 console.error('Error responding to friend request:', err)
                 setError('Failed to respond to request')
             })
     }
+
+
+    useEffect(() => {
+        fetch(`${apiUrl}/api/v1/friends/pending/${playerId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${keycloak?.token}`,
+            },
+        })
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error('Failed to fetch pending requests')
+                }
+                return res.json()
+            })
+            .then((data) => {
+                console.log('Pending Requests:', data)
+                setPendingRequests(data)
+            })
+            .catch((err) => {
+                console.error('Error fetching pending requests:', err)
+                setError('Failed to load pending requests')
+            })
+    }, [keycloak?.token, playerId])
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-purple-950 text-white">
@@ -131,14 +158,14 @@ export default function FriendsPage() {
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold mb-4">Your Friends</h2>
                     <ul>
-                        {Array.isArray(friends) && friends.length > 0 ? (
-                            friends.map((friend: any) => (
-                                <li key={friend.id} className="mb-2 bg-purple-700 p-3 rounded">
-                                    {friend.username} <span>(ID: {friend.id})</span>
+                        {friends.length > 0 ? (
+                            friends.map((friend) => (
+                                <li key={friend.uuid} className="mb-2 bg-purple-700 p-3 rounded">
+                                    {friend.username}
                                 </li>
                             ))
                         ) : (
-                            <p className="text-center">No friends found</p>
+                            <p>No friends found</p>
                         )}
                     </ul>
                 </div>
@@ -146,18 +173,23 @@ export default function FriendsPage() {
                     <h2 className="text-2xl font-bold mb-4">Pending Requests</h2>
                     <ul>
                         {Array.isArray(pendingRequests) && pendingRequests.length > 0 ? (
-                            pendingRequests.map((request: any) => (
-                                <li key={request.id} className="mb-2 bg-purple-700 p-3 rounded flex justify-between">
+                            pendingRequests.map((request) => (
+                                <li key={request.requestUUID}
+                                    className="mb-2 bg-purple-700 p-3 rounded flex justify-between">
                                     {request.sender.username}
                                     <div>
                                         <Button
-                                            onClick={() => handleResponse(request.id, true)}
+                                            onClick={() => {
+                                                console.log('Request ID being passed:', request.requestUUID) // Debugging log
+                                                handleResponse(request.requestUUID, true)
+                                            }}
                                             className="mr-2"
                                         >
                                             Accept
                                         </Button>
+
                                         <Button
-                                            onClick={() => handleResponse(request.id, false)}
+                                            onClick={() => handleResponse(request.requestUUID, false)} // Pass `request.id` correctly
                                             color="danger"
                                         >
                                             Decline
@@ -169,6 +201,7 @@ export default function FriendsPage() {
                             <p className="text-center">No pending requests</p>
                         )}
                     </ul>
+
                 </div>
             </div>
         </div>
