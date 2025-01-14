@@ -14,7 +14,7 @@ steps:
       '-t', '$_DOCKER_IMAGE_PATH',
       '--cache-from', '$_DOCKER_IMAGE_PATH',
       '-f', 'bandit-games/Dockerfile',
-      '.'
+      'bandit-games/'
     ]
 
   - name: 'gcr.io/cloud-builders/docker'
