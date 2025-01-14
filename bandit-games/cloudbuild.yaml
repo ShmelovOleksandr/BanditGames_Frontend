@@ -40,7 +40,7 @@ steps:
       '--network',
       'projects/shared-vpc-host-447502/global/networks/my-shared-vpc',
       '--subnet',
-      'projects/shared-vpc-host-447502/regions/europe-west1/subnetworks/subnet-vpc-connector-front',
+      'projects/shared-vpc-host-447502/regions/europe-west1/subnetworks/subnet-frontend',
       '--vpc-egress',
       'private-ranges-only',
       '--ingress',
