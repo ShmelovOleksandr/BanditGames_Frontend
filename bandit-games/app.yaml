@@ -1,11 +1,11 @@
-runtime: nodejs18
-env: standard
+runtime: custom
+env: flex
 
 service: banditgames-app
 
-vpc_access_connector:
-  name: projects/banditgames-front/locations/europe-west1/connectors/my-vpc-connector
-  egress_setting: all-traffic
+network:
+  name: projects/shared-vpc-host-447502/global/networks/my-shared-vpc
+  subnetwork_name: subnet-services-front
 
 automatic_scaling:
-  min_idle_instances: 2 
+  min_num_instances: 2

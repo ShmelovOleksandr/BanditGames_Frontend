@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "proxy": "https://internal.local",
     "gcp-build": "npm run build",
     "start": "serve -s dist -l 8080",
     "lint": "eslint .",
