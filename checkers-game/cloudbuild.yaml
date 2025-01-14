@@ -52,8 +52,8 @@ steps:
 
 substitutions:
   _LOCATION: 'europe-west1'
-  _SERVICE_NAME: 'banditgames-service'
-  _DOCKER_IMAGE_PATH: 'europe-west1-docker.pkg.dev/banditgames-front/banditgames-repo/banditgames-service:latest'
+  _SERVICE_NAME: 'checkers-service'
+  _DOCKER_IMAGE_PATH: 'europe-west1-docker.pkg.dev/banditgames-front/banditgames-repo/checkers-service:latest'
 
 options:
   automapSubstitutions: true
