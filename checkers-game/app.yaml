@@ -8,12 +8,3 @@ vpc_access_connector:
 
 automatic_scaling:
   min_idle_instances: 2
-
-env_variables:
-  VITE_LOCAL_BASE_URL: "https://internal.local/gameplatform/"
-  VITE_LOCAL_STATISTICS_URL: "https://internal.local/statistics/"
-  VITE_REACT_APP_URL: "https://banditgames-app-dot-banditgames-front.ew.r.appspot.com/"
-  VITE_BANDIT_GAMES_URL: "https://banditgames-app-dot-banditgames-front.ew.r.appspot.com/"
-  VITE_KC_URL: "https://keycloak-service-dot-checkers-test-447118.ew.r.appspot.com/"
-  VITE_KC_REALM: "Bandit Games"
-  VITE_KC_CLIENT_ID: "platform-client"
