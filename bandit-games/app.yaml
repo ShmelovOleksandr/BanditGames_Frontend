@@ -5,6 +5,7 @@ service: banditgames-app
 
 vpc_access_connector:
   name: projects/banditgames-front/locations/europe-west1/connectors/my-vpc-connector
+  egress_setting: all-traffic
 
 automatic_scaling:
   min_idle_instances: 2 
