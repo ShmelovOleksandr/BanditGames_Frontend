@@ -1,17 +1,38 @@
-# build environment
-FROM node:22-alpine as react-build
+# Stage 1: Build the React application
+FROM node:18 as build
+
+# Set working directory
 WORKDIR /app
-COPY . ./
-RUN yarn
-RUN yarn build
 
-# server environment
-FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/configfile.template
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-COPY --from=react-build /app/build /usr/share/nginx/html
+# Install dependencies
+RUN npm install
 
-ENV PORT 8080
-ENV HOST 0.0.0.0
-EXPOSE 8080
-CMD sh -c "envsubst '\$PORT' < /etc/nginx/conf.d/configfile.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+# Copy the entire application
+COPY . .
+
+# Build the React app
+RUN npm run build
+
+# Stage 2: Serve the React application
+FROM node:18
+
+# Set working directory
+WORKDIR /app
+
+# Install a lightweight HTTP server (Express.js)
+RUN npm install express
+
+# Copy the build output from the first stage
+COPY --from=build /app/build ./build
+
+# Copy a minimal server script
+COPY server.js .
+
+# Expose port 3000 for the React app
+EXPOSE 3000
+
+# Start the server
+CMD ["node", "server.js"]
