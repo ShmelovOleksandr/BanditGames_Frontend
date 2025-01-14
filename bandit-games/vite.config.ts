@@ -13,7 +13,8 @@ export default defineConfig({
   },
   proxy: {
     '/api': {
-      target: 'http://internal.local'
+      target: 'http://internal.local',
+      secure: false
     },
   },
   resolve: {
