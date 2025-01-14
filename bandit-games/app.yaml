@@ -1,7 +1,7 @@
 runtime: custom
 env: flex
 
-service: banditgames-app
+service: banditgames-apps
 
 network:
   name: projects/shared-vpc-host-447502/global/networks/my-shared-vpc
