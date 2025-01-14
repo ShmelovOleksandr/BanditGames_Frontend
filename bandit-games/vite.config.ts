@@ -11,6 +11,11 @@ export default defineConfig({
     assetsDir: 'assets', // Directory for static assets
     sourcemap: false, // Disable source maps for production
   },
+  proxy: {
+    '/api': {
+      target: 'http://internal.local'
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
